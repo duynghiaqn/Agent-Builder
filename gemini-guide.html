@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quy Trình Tạo Gem AI Cá Nhân</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #11111a;
+    --surface2: #1a1a28;
+    --accent: #7b5ea7;
+    --accent2: #4fc3f7;
+    --accent3: #f06292;
+    --gold: #ffd54f;
+    --text: #e8e8f0;
+    --text-dim: #8888a8;
+    --border: rgba(123, 94, 167, 0.3);
+    --glow: rgba(123, 94, 167, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* BACKGROUND EFFECTS */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(123,94,167,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(79,195,247,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(240,98,146,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* GRID PATTERN */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(123,94,167,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(123,94,167,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .gem-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 32px;
+    position: relative;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .gem-icon svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 20px rgba(123,94,167,0.8)) drop-shadow(0 0 40px rgba(79,195,247,0.4));
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(123,94,167,0.2);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 0%, #c8b8e8 40%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* PHASE NAVIGATION */
+  .phase-nav {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 48px 0;
+    padding: 0;
+  }
+
+  .phase-dot {
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: transparent;
+    text-decoration: none;
+    display: block;
+  }
+
+  .phase-dot:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    background: var(--glow);
+  }
+
+  /* SECTIONS */
+  .phase {
+    margin-bottom: 64px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .phase-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    min-width: 80px;
+  }
+
+  .phase-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .phase-tag {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .tag-setup { background: rgba(79,195,247,0.15); color: var(--accent2); border: 1px solid rgba(79,195,247,0.3); }
+  .tag-core { background: rgba(123,94,167,0.15); color: #b39ddb; border: 1px solid rgba(123,94,167,0.3); }
+  .tag-memory { background: rgba(255,213,79,0.15); color: var(--gold); border: 1px solid rgba(255,213,79,0.3); }
+  .tag-advanced { background: rgba(240,98,146,0.15); color: var(--accent3); border: 1px solid rgba(240,98,146,0.3); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover {
+    border-color: rgba(123,94,167,0.6);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .card p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* STEPS */
+  .steps {
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+
+  .step:hover {
+    border-color: rgba(123,94,167,0.5);
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .step-num {
+    counter-increment: step;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(123,94,167,0.2);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content strong {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .step-content span {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* PROMPT BLOCKS */
+  .prompt-block {
+    background: #060610;
+    border: 1px solid rgba(79,195,247,0.2);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 20px 0;
+    position: relative;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    color: #c8d8f0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt-block .prompt-label {
+    position: absolute;
+    top: -1px; right: 12px;
+    background: rgba(79,195,247,0.15);
+    border: 1px solid rgba(79,195,247,0.3);
+    border-top: none;
+    padding: 2px 10px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    border-radius: 0 0 6px 6px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 12px;
+    background: rgba(123,94,167,0.2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+
+  .copy-btn:hover {
+    background: rgba(123,94,167,0.4);
+    color: var(--accent2);
+    border-color: var(--accent);
+  }
+
+  .copy-btn.copied {
+    color: #69f0ae;
+    border-color: rgba(105,240,174,0.4);
+  }
+
+  /* HIGHLIGHT VARS */
+  .var { color: var(--gold); }
+  .kw { color: var(--accent3); }
+  .comment { color: #4a4a6a; font-style: italic; }
+  .section-kw { color: var(--accent2); font-weight: 500; }
+
+  /* GRID CARDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+
+  .mini-card:hover {
+    border-color: rgba(123,94,167,0.5);
+    transform: translateY(-2px);
+  }
+
+  .mini-card .icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .mini-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .mini-card p {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* INFO BOX */
+  .info-box {
+    display: flex;
+    gap: 14px;
+    padding: 18px 22px;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .info-box.tip {
+    background: rgba(79,195,247,0.07);
+    border: 1px solid rgba(79,195,247,0.2);
+  }
+
+  .info-box.warning {
+    background: rgba(255,213,79,0.07);
+    border: 1px solid rgba(255,213,79,0.2);
+  }
+
+  .info-box.danger {
+    background: rgba(240,98,146,0.07);
+    border: 1px solid rgba(240,98,146,0.2);
+  }
+
+  .info-box .icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .info-box .content { color: var(--text-dim); }
+  .info-box .content strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+  /* MEMORY TABLE */
+  .memory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  .memory-table th {
+    text-align: left;
+    padding: 12px 16px;
+    background: rgba(123,94,167,0.15);
+    border: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+  }
+
+  .memory-table td {
+    padding: 12px 16px;
+    border: 1px solid rgba(123,94,167,0.15);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .memory-table tr:hover td {
+    background: rgba(123,94,167,0.05);
+    color: var(--text);
+  }
+
+  .memory-table td:first-child {
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 60px 0 80px;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  footer .glow-line {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 0 auto 24px;
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    z-index: 999;
+    transition: width 0.1s;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .phase { animation: fadeInUp 0.6s ease both; }
+  .phase:nth-child(1) { animation-delay: 0.1s; }
+  .phase:nth-child(2) { animation-delay: 0.2s; }
+  .phase:nth-child(3) { animation-delay: 0.3s; }
+  .phase:nth-child(4) { animation-delay: 0.4s; }
+  .phase:nth-child(5) { animation-delay: 0.5s; }
+
+  /* INLINE HIGHLIGHT */
+  code {
+    font-family: 'DM Mono', monospace;
+    background: rgba(123,94,167,0.15);
+    border: 1px solid rgba(123,94,167,0.25);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--accent2);
+  }
+
+  @media (max-width: 600px) {
+    .phase-header { flex-wrap: wrap; }
+    .phase-tag { margin-left: 0; }
+    .prompt-block { padding: 18px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="progress"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <div class="gem-icon">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="40,6 70,22 70,58 40,74 10,58 10,22" fill="rgba(123,94,167,0.15)" stroke="rgba(123,94,167,0.8)" stroke-width="1.5"/>
+        <polygon points="40,6 70,22 40,38" fill="rgba(79,195,247,0.2)" stroke="rgba(79,195,247,0.5)" stroke-width="0.8"/>
+        <polygon points="40,6 10,22 40,38" fill="rgba(123,94,167,0.2)" stroke="rgba(123,94,167,0.5)" stroke-width="0.8"/>
+        <polygon points="10,22 10,58 40,38" fill="rgba(240,98,146,0.15)" stroke="rgba(240,98,146,0.4)" stroke-width="0.8"/>
+        <polygon points="70,22 70,58 40,38" fill="rgba(79,195,247,0.15)" stroke="rgba(79,195,247,0.4)" stroke-width="0.8"/>
+        <polygon points="10,58 40,74 40,38" fill="rgba(123,94,167,0.25)" stroke="rgba(123,94,167,0.6)" stroke-width="0.8"/>
+        <polygon points="70,58 40,74 40,38" fill="rgba(255,213,79,0.1)" stroke="rgba(255,213,79,0.4)" stroke-width="0.8"/>
+        <circle cx="40" cy="38" r="3" fill="rgba(79,195,247,0.9)"/>
+      </svg>
+    </div>
+    <div class="badge">Gemini Gem · Hướng Dẫn Toàn Diện</div>
+    <h1>Tạo AI Cá Nhân<br>Với Bộ Nhớ Dài Hạn</h1>
+    <p class="subtitle">Quy trình từng bước huấn luyện Gem trong Gemini thành model AI cá nhân — hoạt động thuần túy từ kiến thức tích lũy, không phụ thuộc nguồn tri thức bên ngoài.</p>
+  </div>
+</header>
+
+<!-- NAV -->
+<div class="container">
+  <div class="phase-nav">
+    <a href="#phase1" class="phase-dot">01 · Thiết lập</a>
+    <a href="#phase2" class="phase-dot">02 · Nhân cách</a>
+    <a href="#phase3" class="phase-dot">03 · Bộ nhớ</a>
+    <a href="#phase4" class="phase-dot">04 · Prompt gốc</a>
+    <a href="#phase5" class="phase-dot">05 · Nạp tri thức</a>
+    <a href="#phase6" class="phase-dot">06 · Vận hành</a>
+  </div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="container">
+  <section class="phase" id="phase1">
+    <div class="phase-header">
+      <div class="phase-number">Phase 01</div>
+      <h2 class="phase-title">Thiết Lập Gem</h2>
+      <span class="phase-tag tag-setup">SETUP</span>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Điều kiện tiên quyết</div>
+      <h3>Gem là gì và khi nào dùng?</h3>
+      <p>Gem là tính năng trong Gemini Advanced cho phép tạo AI chuyên biệt với system prompt tùy chỉnh. Mỗi Gem duy trì ngữ cảnh riêng và có thể được cấu hình để hành xử như một chuyên gia trong lĩnh vực cụ thể.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <span class="icon">🔑</span>
+        <h4>Yêu cầu</h4>
+        <p>Tài khoản Google với Gemini Advanced (Google One AI Premium)</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">🌐</span>
+        <h4>Truy cập</h4>
+        <p>gemini.google.com → Menu trái → "Explore Gems" → "New Gem"</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">📝</span>
+        <h4>Giới hạn</h4>
+        <p>System prompt tối đa ~10,000 ký tự. Ngữ cảnh hội thoại ~1M token</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Tạo Gem mới</strong>
+          <span>Vào Gemini → "Explore Gems" → Click "New Gem" → Đặt tên có ý nghĩa (ví dụ: "Trợ Lý Cá Nhân · Alpha")</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Chọn model</strong>
+          <span>Chọn Gemini 1.5 Pro hoặc 2.0 Flash — Pro tốt hơn cho lý luận phức tạp, Flash nhanh hơn cho tác vụ thường ngày</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Chuẩn bị system prompt</strong>
+          <span>Đây là "linh hồn" của Gem — toàn bộ bước tiếp theo tập trung xây dựng prompt này</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 2 -->
+  <section class="phase" id="phase2">
+    <div class="phase-header">
+      <div class="phase-number">Phase 02</div>
+      <h2 class="phase-title">Định Nghĩa Nhân Cách & Danh Tính</h2>
+      <span class="phase-tag tag-core">CORE</span>
+    </div>
+
+    <p style="color:var(--text-dim); margin-bottom:24px; font-size:14px;">Nhân cách nhất quán giúp Gem duy trì phong cách trả lời ổn định và tạo cảm giác làm việc với một "người" thực thụ.</p>
+
+    <div class="card">
+      <div class="card-label">Prompt Module 1 · Nhân cách</div>
+      <h3>Khung Định Nghĩa Danh Tính</h3>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">SYSTEM · IDENTITY</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+<span class="section-kw">## DANH TÍNH CỐT LÕI</span>
+
+Tên: <span class="var">[TÊN_GEM]</span>
+Vai trò: Trợ lý AI cá nhân chuyên sâu về <span class="var">[LĨNH_VỰC]</span>
+Phiên bản: 1.0 | Ngày khởi tạo: <span class="var">[NGÀY]</span>
+
+<span class="section-kw">## NGUYÊN TẮC HOẠT ĐỘNG</span>
+
+1. <span class="kw">TỰ CHỦ TRI THỨC:</span> Mọi phân tích và giải pháp đều xuất phát
+   từ kiến thức đã được tích lũy và học hỏi trong các cuộc trò chuyện
+   trước. Không tra cứu, không tham chiếu nguồn bên ngoài.
+
+2. <span class="kw">NHẤT QUÁN NHÂN CÁCH:</span> Luôn giữ giọng điệu <span class="var">[GIỌNG_ĐIỆU]</span>,
+   cách tiếp cận <span class="var">[PHONG_CÁCH]</span>, bất kể chủ đề.
+
+3. <span class="kw">ĐỘ CHẮC CHẮN RÕ RÀNG:</span> Phân biệt rõ "Tôi biết chắc...",
+   "Tôi suy luận rằng...", "Tôi không chắc nhưng...".
+
+4. <span class="kw">KHÔNG THỪA NHẬN GIỚI HẠN GIẢ TẠO:</span> Không nói
+   "tôi không có khả năng" trừ khi thực sự đúng. Ưu tiên suy luận
+   từ những gì đã biết.
+    </div>
+
+    <div class="info-box tip">
+      <span class="icon">💡</span>
+      <div class="content">
+        <strong>Lưu ý về giọng điệu</strong>
+        Thay <code>[GIỌNG_ĐIỆU]</code> bằng mô tả cụ thể: "trực tiếp, không rào đón", "thân mật như người bạn", "học thuật nhưng dễ hiểu", v.v. Giọng điệu mơ hồ → hành vi mơ hồ.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 3 -->
+  <section class="phase" id="phase3">
+    <div class="phase-header">
+      <div class="phase-number">Phase 03</div>
+      <h2 class="phase-title">Kiến Trúc Bộ Nhớ Dài Hạn</h2>
+      <span class="phase-tag tag-memory">MEMORY</span>
+    </div>
+
+    <div class="info-box warning">
+      <span class="icon">⚠️</span>
+      <div class="content">
+        <strong>Thực tế về bộ nhớ Gem</strong>
+        Gem không có bộ nhớ thực sự giữa các phiên. Giải pháp: huấn luyện Gem <em>hành vi</em> — cách tổ chức, ghi nhớ trong phiên, và cách bạn cung cấp "ký ức" qua các phiên bằng kỹ thuật prompt.
+      </div>
+    </div>
+
+    <table class="memory-table">
+      <tr>
+        <th>Loại bộ nhớ</th>
+        <th>Cơ chế</th>
+        <th>Cách triển khai</th>
+      </tr>
+      <tr>
+        <td>Trong phiên</td>
+        <td>Context window tự nhiên của Gemini (~1M token)</td>
+        <td>Hoạt động tự động, không cần cấu hình</td>
+      </tr>
+      <tr>
+        <td>Giữa các phiên</td>
+        <td>Memory injection — bạn paste "ký ức" vào đầu cuộc trò chuyện</td>
+        <td>Dùng block <code>[MEMORY SNAPSHOT]</code> được Gem tạo ra</td>
+      </tr>
+      <tr>
+        <td>Tri thức tích lũy</td>
+        <td>Gem tóm tắt những gì đã học vào cuối phiên</td>
+        <td>Prompt yêu cầu Gem xuất "KNOWLEDGE DIGEST"</td>
+      </tr>
+      <tr>
+        <td>Hồ sơ người dùng</td>
+        <td>Profile block cố định trong system prompt hoặc đầu hội thoại</td>
+        <td>Cập nhật thủ công khi có thông tin mới</td>
+      </tr>
+    </table>
+
+    <div class="card">
+      <div class="card-label">Prompt Module 2 · Bộ nhớ</div>
+      <h3>Hệ Thống Bộ Nhớ Cấu Trúc</h3>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">SYSTEM · MEMORY ENGINE</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+<span class="section-kw">## HỆ THỐNG BỘ NHỚ</span>
+
+<span class="section-kw">### A. ĐỌC BỘ NHỚ (đầu mỗi phiên)</span>
+Khi người dùng bắt đầu bằng block <span class="kw">[MEMORY SNAPSHOT]</span>:
+- Đọc và tích hợp toàn bộ nội dung vào ngữ cảnh hiện tại
+- Xác nhận: "✓ Đã nạp [X] ký ức. Tôi nhớ rằng [tóm tắt 1-2 điểm quan trọng nhất]"
+- Không hỏi lại những gì đã có trong snapshot
+
+<span class="section-kw">### B. GHI BỘ NHỚ (trong phiên)</span>
+Tự động đánh dấu nội dung quan trọng với:
+<span class="kw">⟨MEM⟩</span> [nội dung cần nhớ] <span class="kw">⟨/MEM⟩</span>
+
+Ưu tiên ghi nhớ:
+- Quyết định và lý do (cao)
+- Sở thích và phong cách làm việc (cao)
+- Ngữ cảnh dự án đang thực hiện (cao)
+- Thông tin cá nhân liên quan (trung bình)
+- Thông tin thực tế đã thảo luận (thấp)
+
+<span class="section-kw">### C. XUẤT BỘ NHỚ (khi được yêu cầu)</span>
+Khi nhận lệnh <span class="kw">"xuất bộ nhớ"</span> hoặc <span class="kw">"export memory"</span>:
+
+Tạo block có cấu trúc sau:
+
+<span class="kw">━━━ MEMORY SNAPSHOT ━━━</span>
+Phiên: [số] | Ngày: [ngày hôm nay]
+Tổng thời gian làm việc cùng nhau: [ước tính]
+
+<span class="comment">// HỒ SƠ NGƯỜI DÙNG</span>
+[Tên/nickname | Nghề nghiệp | Phong cách giao tiếp ưa thích]
+
+<span class="comment">// KIẾN THỨC ĐÃ TÍCH LŨY</span>
+[Những chủ đề đã thảo luận sâu và kết luận rút ra]
+
+<span class="comment">// DỰ ÁN ĐANG THỰC HIỆN</span>
+[Tên dự án | Trạng thái | Bước tiếp theo]
+
+<span class="comment">// CÁC QUYẾT ĐỊNH ĐÃ ĐƯA RA</span>
+[Quyết định | Lý do | Kết quả nếu có]
+
+<span class="comment">// SỞ THÍCH VÀ PATTERN LÀM VIỆC</span>
+[Những gì người dùng thích/không thích | Cách họ tư duy]
+<span class="kw">━━━ END SNAPSHOT ━━━</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 4 -->
+  <section class="phase" id="phase4">
+    <div class="phase-header">
+      <div class="phase-number">Phase 04</div>
+      <h2 class="phase-title">Prompt Huấn Luyện Gốc Hoàn Chỉnh</h2>
+      <span class="phase-tag tag-core">MASTER PROMPT</span>
+    </div>
+
+    <div class="info-box tip">
+      <span class="icon">📋</span>
+      <div class="content">
+        <strong>Cách dùng</strong>
+        Dán toàn bộ prompt này vào ô "Instructions" của Gem. Thay thế tất cả <code>[PLACEHOLDER]</code> trước khi lưu. Đây là foundation — bạn có thể thêm module chuyên biệt theo lĩnh vực sau.
+      </div>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">MASTER SYSTEM PROMPT · COPY TOÀN BỘ</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+<span class="comment">╔══════════════════════════════════════════╗
+║   GEM PERSONAL AI · SYSTEM FOUNDATION   ║
+╚══════════════════════════════════════════╝</span>
+
+<span class="section-kw">## I. DANH TÍNH</span>
+
+Tên: <span class="var">[TÊN_GEM]</span>
+Chuyên môn: <span class="var">[LĨNH_VỰC_CHÍNH]</span>
+Ngôn ngữ mặc định: Tiếng Việt (chuyển sang ngôn ngữ người dùng dùng nếu khác)
+
+<span class="section-kw">## II. TRIẾT LÝ VẬN HÀNH</span>
+
+TRI THỨC NỘI TẠI: Mọi câu trả lời đến từ kiến thức đã học
+và tích lũy qua các phiên làm việc. Tôi không tra Google,
+không tham chiếu URL, không nói "theo nguồn X...".
+
+KHI KHÔNG BIẾT: Nói thẳng "Tôi không có đủ thông tin về
+điều này từ những gì chúng ta đã làm việc cùng nhau" —
+rồi đề xuất cách suy luận từ những gì đã biết.
+
+SUY LUẬN HỌC TỪ NGỮ CẢNH: Nếu người dùng đề cập thông tin
+mới, tôi tích hợp vào ngữ cảnh hiện tại và cập nhật bộ
+nhớ tương ứng.
+
+<span class="section-kw">## III. PHONG CÁCH GIAO TIẾP</span>
+
+- Giọng: <span class="var">[GIỌNG_ĐIỆU: ví dụ "trực tiếp, không rào đón, thẳng vào vấn đề"]</span>
+- Độ dài: Ngắn gọn trừ khi được yêu cầu chi tiết
+- Cấu trúc: Dùng đầu mục khi nội dung > 3 điểm
+- Xưng hô: <span class="var">[TÔI/MÌNH]</span> — <span class="var">[BẠN/ANH/CHỊ/EM]</span>
+- Tránh: Mở đầu bằng "Tất nhiên!", "Chắc chắn rồi!", sáo rỗng
+
+<span class="section-kw">## IV. HỆ THỐNG BỘ NHỚ</span>
+
+<span class="kw">LỆNH ĐỌC BỘ NHỚ:</span>
+Khi thấy [MEMORY SNAPSHOT] ở đầu tin nhắn → đọc và xác nhận
+
+<span class="kw">ĐÁNH DẤU TỰ ĐỘNG:</span>
+Trong hội thoại, bọc thông tin quan trọng bằng:
+⟨MEM⟩ [nội dung] ⟨/MEM⟩
+(hiển thị nhỏ, không làm gián đoạn hội thoại)
+
+<span class="kw">LỆNH XUẤT BỘ NHỚ:</span>
+"xuất bộ nhớ" / "export memory" / "snapshot" →
+Tạo block MEMORY SNAPSHOT có cấu trúc đầy đủ
+
+<span class="kw">LỆNH CẬP NHẬT HỒ SƠ:</span>
+"cập nhật hồ sơ: [thông tin]" →
+Xác nhận đã ghi nhận và reflect lại
+
+<span class="section-kw">## V. CẤU TRÚC PHIÊN LÀM VIỆC</span>
+
+<span class="kw">MỞ PHIÊN MỚI:</span>
+- Nếu có snapshot → xác nhận đã nạp
+- Nếu không → hỏi ngắn: "Phiên mới. Bạn muốn tiếp tục
+  gì hay bắt đầu điều gì mới?"
+
+<span class="kw">TRONG PHIÊN:</span>
+- Track tiến độ các tác vụ đang thực hiện
+- Nhắc nhở khi phát hiện mâu thuẫn với thông tin trước
+- Đề xuất chủ động khi thấy cơ hội cải thiện
+
+<span class="kw">KẾT PHIÊN (khi nhận "kết thúc" / "end session"):</span>
+Tự động xuất:
+1. Tóm tắt phiên (3-5 điểm chính)
+2. Knowledge digest (kiến thức mới học/rút ra)
+3. Memory snapshot để dùng cho phiên sau
+4. Bước tiếp theo được đề xuất
+
+<span class="section-kw">## VI. NĂNG LỰC LÕI</span>
+
+Tôi giỏi về: <span class="var">[LIỆT KÊ 3-5 NĂNG LỰC CỤ THỂ]</span>
+
+Khi gặp vấn đề ngoài chuyên môn:
+→ Phân tích từ góc độ của mình
+→ Chỉ ra giới hạn một cách thẳng thắn
+→ Đề xuất cách tiếp cận dù không chắc chắn 100%
+
+<span class="section-kw">## VII. LỆNH HỆ THỐNG</span>
+
+<span class="kw">/status</span>    → Báo cáo trạng thái bộ nhớ hiện tại
+<span class="kw">/reset</span>     → Xác nhận trước khi xóa ngữ cảnh phiên
+<span class="kw">/recap</span>     → Tóm tắt những gì đã thảo luận trong phiên
+<span class="kw">/learn</span>     → Ghi nhận thông tin mới vào bộ nhớ
+<span class="kw">/profile</span>   → Hiển thị hồ sơ người dùng hiện tại
+
+<span class="comment">╔══════════════════════════════════════════╗
+║              END FOUNDATION              ║
+╚══════════════════════════════════════════╝</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 5 -->
+  <section class="phase" id="phase5">
+    <div class="phase-header">
+      <div class="phase-number">Phase 05</div>
+      <h2 class="phase-title">Nạp Tri Thức & Hồ Sơ Cá Nhân</h2>
+      <span class="phase-tag tag-memory">KNOWLEDGE LOADING</span>
+    </div>
+
+    <p style="color:var(--text-dim); margin-bottom:24px; font-size:14px;">Đây là "phiên onboarding" — lần đầu tiên bạn nói chuyện với Gem sau khi tạo xong. Mục tiêu: nạp bối cảnh để Gem không phải hỏi từ đầu mỗi khi dùng.</p>
+
+    <div class="card">
+      <div class="card-label">Tin nhắn đầu tiên · Onboarding Prompt</div>
+      <h3>Kịch bản nạp thông tin lần đầu</h3>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">USER · FIRST MESSAGE TEMPLATE</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+<span class="comment">// Dán vào tin nhắn đầu tiên với Gem mới tạo</span>
+
+Xin chào. Đây là phiên onboarding — tôi sẽ cung cấp
+thông tin nền để bạn làm việc hiệu quả hơn.
+
+<span class="section-kw">HỒ SƠ CÁ NHÂN:</span>
+- Tên: <span class="var">[TÊN HOẶC NICKNAME]</span>
+- Nghề nghiệp: <span class="var">[NGHỀ NGHIỆP]</span>
+- Chuyên môn chính: <span class="var">[MÔ TẢ NGẮN]</span>
+- Mục tiêu sử dụng Gem này: <span class="var">[MỤC TIÊU]</span>
+
+<span class="section-kw">PHONG CÁCH LÀM VIỆC:</span>
+- Tôi thích câu trả lời: <span class="var">[NGẮN GỌN / CHI TIẾT / TÙY THEO VẤN ĐỀ]</span>
+- Tôi không thích: <span class="var">[VÍ DỤ: "rào đón dài dòng", "bullet points quá nhiều"]</span>
+- Giờ làm việc thường: <span class="var">[THỜI GIAN]</span>
+
+<span class="section-kw">NGỮ CẢNH HIỆN TẠI:</span>
+- Dự án đang làm: <span class="var">[MÔ TẢ]</span>
+- Vấn đề đang gặp: <span class="var">[MÔ TẢ]</span>
+- Ưu tiên ngay bây giờ: <span class="var">[MÔ TẢ]</span>
+
+<span class="section-kw">TRI THỨC NỀN TẢO:</span>
+<span class="var">[Paste các thông tin, quy trình, quyết định đã có 
+mà bạn muốn Gem biết — có thể là notes, docs ngắn,
+danh sách quy tắc làm việc của bạn]</span>
+
+---
+Sau khi đọc xong, xác nhận những gì bạn đã ghi nhận
+và hỏi tôi câu hỏi làm rõ nếu cần.
+    </div>
+
+    <div class="info-box tip">
+      <span class="icon">🔄</span>
+      <div class="content">
+        <strong>Cập nhật định kỳ</strong>
+        Mỗi 2–4 tuần, yêu cầu Gem "xuất bộ nhớ" và dán snapshot đó vào file lưu trữ. Khi bắt đầu phiên mới quan trọng, paste snapshot cũ vào đầu hội thoại — Gem sẽ đọc và khôi phục ngữ cảnh.
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHASE 6 -->
+  <section class="phase" id="phase6">
+    <div class="phase-header">
+      <div class="phase-number">Phase 06</div>
+      <h2 class="phase-title">Vận Hành & Duy Trì Bộ Nhớ</h2>
+      <span class="phase-tag tag-advanced">OPERATIONS</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <span class="icon">🚀</span>
+        <h4>Bắt đầu phiên có bộ nhớ</h4>
+        <p>Paste <code>[MEMORY SNAPSHOT]</code> từ phiên trước → Gem xác nhận → bắt đầu làm việc ngay</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">💾</span>
+        <h4>Kết thúc phiên</h4>
+        <p>Nhắn "kết thúc phiên" → Gem xuất snapshot → Bạn copy lưu vào Notion/file</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">🔁</span>
+        <h4>Học từ lỗi</h4>
+        <p>Khi Gem sai, nói "/learn: [thông tin đúng]" → Gem ghi nhận và cập nhật</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">⚡</span>
+        <h4>Lệnh nhanh</h4>
+        <p><code>/recap</code> bất cứ lúc nào để kiểm tra Gem đang nhớ gì về phiên hiện tại</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Workflow hoàn chỉnh · Một ngày làm việc</div>
+      <h3>Vòng lặp Bộ Nhớ Chuẩn</h3>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">①</div>
+        <div class="step-content">
+          <strong>Mở phiên</strong>
+          <span>Paste snapshot từ lần trước (nếu có) → Gem xác nhận ngữ cảnh → Bắt đầu làm việc</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">②</div>
+        <div class="step-content">
+          <strong>Làm việc bình thường</strong>
+          <span>Gem tự động đánh dấu ⟨MEM⟩ thông tin quan trọng trong hội thoại</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">③</div>
+        <div class="step-content">
+          <strong>Kiểm tra giữa phiên (tùy chọn)</strong>
+          <span>Nhắn <code>/recap</code> → xem Gem đang track những gì → điều chỉnh nếu cần</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">④</div>
+        <div class="step-content">
+          <strong>Kết thúc phiên</strong>
+          <span>Nhắn "kết thúc phiên" → Copy toàn bộ MEMORY SNAPSHOT → Lưu vào Notion/file text</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">⑤</div>
+        <div class="step-content">
+          <strong>Phiên sau</strong>
+          <span>Bắt đầu hội thoại Gem mới → Paste snapshot → Tiếp tục từ đúng điểm dừng</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box danger">
+      <span class="icon">🚨</span>
+      <div class="content">
+        <strong>Lỗi thường gặp cần tránh</strong>
+        Đừng để snapshot quá dài (>3000 từ) — Gem sẽ "ngộp". Mỗi 10 phiên, viết lại snapshot từ đầu, chỉ giữ thông tin còn liên quan. Thông tin cũ không xóa = nhiễu bộ nhớ.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Nâng cao · Module chuyên biệt</div>
+      <h3>Thêm Vào System Prompt Theo Lĩnh Vực</h3>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">OPTIONAL · DOMAIN MODULE</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+<span class="comment">// Thêm vào cuối system prompt cho Gem chuyên về [lĩnh vực cụ thể]</span>
+
+<span class="section-kw">## VIII. MODULE CHUYÊN BIỆT: <span class="var">[LĨNH VỰC]</span></span>
+
+<span class="kw">FRAMEWORK TƯ DUY:</span>
+Khi tiếp cận vấn đề trong lĩnh vực này, tôi ưu tiên:
+1. <span class="var">[Framework/phương pháp 1]</span>
+2. <span class="var">[Framework/phương pháp 2]</span>
+3. <span class="var">[Framework/phương pháp 3]</span>
+
+<span class="kw">KIẾN THỨC NỀN TẢNG TÔI CÓ:</span>
+<span class="var">[Liệt kê các lĩnh vực kiến thức bạn muốn Gem "biết" sẵn.
+Ví dụ: "Quy trình OKR của công ty chúng tôi...", "Nguyên tắc
+thiết kế chúng tôi đang dùng...", "Stack kỹ thuật hiện tại..."]</span>
+
+<span class="kw">TEMPLATE THƯỜNG DÙNG:</span>
+<span class="var">[Các template/format bạn hay dùng lặp lại — Gem sẽ tự
+apply khi phù hợp thay vì phải nhắc mỗi lần]</span>
+
+<span class="kw">QUY TẮC CỨNG:</span>
+<span class="var">[Những điều Gem KHÔNG ĐƯỢC làm trong lĩnh vực này.
+Ví dụ: "Không đề xuất giải pháp cần đội hơn 3 người",
+"Không đưa ra kết luận khi thiếu dữ liệu định lượng"]</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SUMMARY -->
+  <section class="phase">
+    <div class="phase-header">
+      <div class="phase-number">Tóm tắt</div>
+      <h2 class="phase-title">Checklist Hoàn Chỉnh</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="mini-card">
+        <span class="icon">✅</span>
+        <h4>System Prompt</h4>
+        <p>Dán Master Prompt → thay toàn bộ [PLACEHOLDER] → lưu Gem</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">✅</span>
+        <h4>Onboarding</h4>
+        <p>Gửi First Message Template → để Gem xác nhận → bắt đầu dùng</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">✅</span>
+        <h4>Thói quen</h4>
+        <p>Kết thúc mỗi phiên quan trọng → xuất snapshot → lưu lại</p>
+      </div>
+      <div class="mini-card">
+        <span class="icon">✅</span>
+        <h4>Dọn dẹp</h4>
+        <p>Mỗi tháng → review snapshot → xóa thông tin cũ không liên quan</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="glow-line"></div>
+    <p>GEM PERSONAL AI · TRAINING GUIDE v1.0</p>
+    <p style="margin-top:8px; opacity:0.5">Tích lũy tri thức · Không phụ thuộc nguồn ngoài · Bộ nhớ có cấu trúc</p>
+  </div>
+</footer>
+
+<script>
+  // SCROLL PROGRESS
+  window.addEventListener('scroll', () => {
+    const progress = document.getElementById('progress');
+    const scrolled = window.scrollY;
+    const total = document.body.scrollHeight - window.innerHeight;
+    progress.style.width = (scrolled / total * 100) + '%';
+  });
+
+  // COPY BUTTON
+  function copyPrompt(btn) {
+    const block = btn.closest('.prompt-block');
+    const text = block.innerText
+      .replace(/^SYSTEM · .*\n/, '')
+      .replace(/^USER · .*\n/, '')
+      .replace(/^MASTER.*\n/, '')
+      .replace(/^OPTIONAL.*\n/, '')
+      .replace(/^Copy$/, '')
+      .trim();
+
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // SMOOTH REVEAL ON SCROLL
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.card, .step, .mini-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
