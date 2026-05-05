@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My GPT Prompt Builder</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --bg2: #111827;
+      --panel: rgba(255,255,255,0.04);
+      --panel2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.05);
+      --green: #10a37f;
+      --green-dim: rgba(16,163,127,0.5);
+      --green-soft: rgba(16,163,127,0.1);
+      --green-glow: rgba(16,163,127,0.25);
+      --blue: #1d9bf0;
+      --blue-soft: rgba(29,155,240,0.1);
+      --purple: #8b5cf6;
+      --purple-soft: rgba(139,92,246,0.1);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245,158,11,0.1);
+      --rose: #f43f5e;
+      --rose-soft: rgba(244,63,94,0.1);
+      --text: #f0f6fc;
+      --text2: #94a3b8;
+      --text3: #475569;
+      --sidebar-bg: rgba(10,15,26,0.95);
+      --out-bg: rgba(0,0,0,0.4);
+      --font: 'Syne', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --serif: 'Instrument Serif', serif;
+    }
+
+    /* ── LIGHT MODE ── */
+    html.light {
+      --bg: #f0f4f8;
+      --bg2: #e8edf3;
+      --panel: rgba(255,255,255,0.85);
+      --panel2: rgba(255,255,255,0.95);
+      --border: rgba(0,0,0,0.1);
+      --border2: rgba(0,0,0,0.06);
+      --green: #0d8f6f;
+      --green-dim: rgba(13,143,111,0.5);
+      --green-soft: rgba(13,143,111,0.09);
+      --green-glow: rgba(13,143,111,0.2);
+      --blue: #0e7ac4;
+      --blue-soft: rgba(14,122,196,0.1);
+      --purple: #6d45d4;
+      --purple-soft: rgba(109,69,212,0.1);
+      --amber: #c47d00;
+      --amber-soft: rgba(196,125,0,0.1);
+      --rose: #d4264a;
+      --rose-soft: rgba(212,38,74,0.1);
+      --text: #0f1e30;
+      --text2: #3d5470;
+      --text3: #7a96b2;
+      --sidebar-bg: rgba(255,255,255,0.97);
+      --out-bg: rgba(248,251,255,0.95);
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; margin-top: 12px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; cursor: pointer; transition: all 0.25s;
+      user-select: none;
+    }
+    .theme-toggle:hover { border-color: var(--green-dim); background: var(--panel2); }
+    .theme-toggle-label {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 10px;
+      color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .theme-toggle-label svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .theme-pill {
+      width: 36px; height: 20px; border-radius: 10px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+      position: relative; transition: all 0.3s; flex-shrink: 0;
+    }
+    .theme-pill::after {
+      content: ''; position: absolute;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--text3); top: 3px; left: 3px; transition: all 0.3s;
+    }
+    html.light .theme-pill {
+      background: rgba(13,143,111,0.18); border-color: var(--green);
+    }
+    html.light .theme-pill::after {
+      background: var(--green); left: 19px;
+      box-shadow: 0 0 6px rgba(13,143,111,0.4);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BG MESH */
+    body::before {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background:
+        radial-gradient(ellipse 600px 400px at 10% 10%, rgba(16,163,127,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 500px at 90% 80%, rgba(139,92,246,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 300px at 50% 50%, rgba(29,155,240,0.04) 0%, transparent 60%);
+      transition: opacity 0.4s;
+    }
+    html.light body::before { opacity: 0.35; }
+    body::after {
+      content:'';
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    html.light body::after { opacity: 0.4; }
+
+    html.light .out-code { color: #1a2e40; }
+    html.light .scanline { opacity: 0.12; }
+    .scanline {
+      position:fixed; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      z-index:100; animation: scan 8s linear infinite;
+      pointer-events:none; opacity:0.3;
+    }
+    @keyframes scan { 0%{top:-2px} 100%{top:100vh} }
+
+    /* LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+      position: relative; z-index:1;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(24px);
+      position: sticky; top:0; height:100vh;
+      overflow-y:auto; display:flex; flex-direction:column;
+      scrollbar-width:thin; scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar-brand {
+      padding: 28px 24px 24px;
+      border-bottom: 1px solid var(--border2);
+      position:relative; overflow:hidden;
+    }
+    .sidebar-brand::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      opacity:0.5;
+    }
+
+    .brand-logo {
+      display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    }
+    .logo-icon {
+      width:44px; height:44px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(16,163,127,0.2), rgba(16,163,127,0.05));
+      border: 1px solid var(--green-dim);
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+      box-shadow: 0 0 20px rgba(16,163,127,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+    @keyframes logoGlow {
+      0%,100%{box-shadow:0 0 20px rgba(16,163,127,0.2), inset 0 1px 0 rgba(255,255,255,0.1)}
+      50%{box-shadow:0 0 32px rgba(16,163,127,0.4), inset 0 1px 0 rgba(255,255,255,0.15)}
+    }
+    .brand-title {
+      font-family: var(--serif); font-size:18px; color:var(--text); line-height:1.2;
+    }
+    .brand-title em { color:var(--green); font-style:italic; }
+    .brand-sub {
+      font-family:var(--mono); font-size:9px; color:var(--text3);
+      letter-spacing:3px; text-transform:uppercase; margin-top:2px;
+    }
+    .brand-badge {
+      display:inline-flex; align-items:center; gap:6px; margin-top:12px;
+      padding:4px 10px; border-radius:20px;
+      background: rgba(16,163,127,0.1); border:1px solid rgba(16,163,127,0.25);
+      font-family:var(--mono); font-size:9px; color:var(--green); letter-spacing:1px;
+    }
+    .badge-dot {
+      width:5px; height:5px; border-radius:50%; background:var(--green);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink {0%,100%{opacity:1} 50%{opacity:0.2}}
+
+    /* NAV */
+    .step-nav { padding:20px 0; flex:1; }
+    .nav-item { cursor:pointer; position:relative; }
+    .nav-item-inner {
+      display:flex; align-items:flex-start; gap:14px;
+      padding:11px 24px; width:100%; transition:background 0.2s;
+      border-left:2px solid transparent;
+    }
+    .nav-item.active .nav-item-inner {
+      background: rgba(16,163,127,0.07); border-left-color:var(--green);
+    }
+    .nav-item:hover .nav-item-inner { background: rgba(255,255,255,0.03); }
+    .nav-bullet {
+      width:30px; height:30px; border-radius:8px;
+      border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+      font-family:var(--mono); font-size:11px; font-weight:500; color:var(--text3);
+      flex-shrink:0; margin-top:1px; transition:all 0.3s;
+    }
+    .nav-item.active .nav-bullet {
+      border-color:var(--green); color:var(--green);
+      background: rgba(16,163,127,0.15); box-shadow:0 0 12px rgba(16,163,127,0.2);
+    }
+    .nav-item.done .nav-bullet {
+      border-color:rgba(16,163,127,0.5); background:rgba(16,163,127,0.1); color:var(--green);
+      font-size:14px;
+    }
+    .nav-text { flex:1; }
+    .nav-label {
+      font-family:var(--mono); font-size:8px; letter-spacing:2.5px;
+      text-transform:uppercase; color:var(--text3); margin-bottom:2px;
+    }
+    .nav-name {
+      font-size:13px; font-weight:600; color:var(--text2); line-height:1.3; transition:color 0.2s;
+    }
+    .nav-item.active .nav-name { color:var(--text); }
+    .nav-item.done .nav-name { color:var(--text3); }
+    .nav-connector {
+      width:1px; height:12px;
+      background:var(--border2); margin:0 24px 0 calc(24px + 15px);
+    }
+
+    /* FOOTER */
+    .sidebar-footer {
+      padding:18px 24px; border-top:1px solid var(--border2);
+    }
+    .prog-info {
+      display:flex; justify-content:space-between;
+      font-family:var(--mono); font-size:9px; color:var(--text3); margin-bottom:7px;
+    }
+    .prog-track {
+      height:2px; background:rgba(255,255,255,0.06); border-radius:1px; overflow:hidden;
+    }
+    .prog-fill {
+      height:100%;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      border-radius:1px; transition: width 0.6s cubic-bezier(.4,0,.2,1);
+      box-shadow:0 0 8px var(--green);
+    }
+
+    /* ── MAIN ── */
+    .main { padding:52px 64px; max-width:860px; }
+
+    /* PANEL */
+    .panel { display:none; }
+    .panel.active {
+      display:block; animation:panelIn 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes panelIn {
+      from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)}
+    }
+
+    /* PANEL HEAD */
+    .panel-head { margin-bottom:44px; }
+    .ph-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:5px 14px; border-radius:20px;
+      background: rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2);
+      font-family:var(--mono); font-size:10px; letter-spacing:2px;
+      color:var(--green); text-transform:uppercase; margin-bottom:18px;
+    }
+    .ph-badge::before {
+      content:''; width:6px; height:6px; border-radius:50%;
+      background:var(--green); animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)}}
+    .ph-title {
+      font-family:var(--serif); font-size:clamp(26px,3.5vw,40px); font-weight:400;
+      color:var(--text); line-height:1.1; margin-bottom:12px;
+      font-style:italic;
+    }
+    .ph-title strong { font-style:normal; font-weight:700; }
+    .ph-desc { font-size:14px; color:var(--text2); line-height:1.7; max-width:480px; }
+
+    /* VISUAL BOX */
+    .step-visual {
+      background: var(--panel); border:1px solid var(--border);
+      border-radius:14px; padding:24px; margin-bottom:32px;
+      position:relative; overflow:hidden;
+    }
+    .step-visual::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent); opacity:0.4;
+    }
+    .visual-label {
+      font-family:var(--mono); font-size:9px; letter-spacing:2px;
+      text-transform:uppercase; color:var(--text3); margin-bottom:14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .visual-label::after { content:''; flex:1; height:1px; background:var(--border2); }
+    .visual-svg-wrap {
+      display:flex; justify-content:center; align-items:center; min-height:120px;
+    }
+
+    /* FORM */
+    .field { margin-bottom:26px; }
+    .field.row2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:26px; }
+    .field.row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:26px; }
+
+    label {
+      display:block; font-size:11px; font-weight:700; color:var(--text2);
+      margin-bottom:8px; letter-spacing:0.8px; text-transform:uppercase;
+    }
+    label .req { color:var(--green); margin-left:3px; }
+    label .note {
+      font-weight:400; color:var(--text3); font-size:10px;
+      text-transform:none; margin-left:6px; letter-spacing:0;
+    }
+
+    input[type=text], textarea, select {
+      width:100%; background:rgba(255,255,255,0.04);
+      border:1px solid var(--border); border-radius:10px;
+      padding:11px 15px; font-family:var(--font); font-size:14px; color:var(--text);
+      transition:all 0.25s; outline:none; appearance:none;
+    }
+    input[type=text]:focus, textarea:focus, select:focus {
+      border-color:var(--green); background:rgba(16,163,127,0.05);
+      box-shadow:0 0 0 3px rgba(16,163,127,0.08);
+    }
+    input[type=text]::placeholder, textarea::placeholder { color:var(--text3); font-weight:400; }
+    textarea { resize:vertical; min-height:90px; line-height:1.65; }
+    select {
+      cursor:pointer; color:var(--text2);
+      background-image:url("data:image/svg+xml,%3Csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%2310a37f' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 14px center; padding-right:38px;
+    }
+    select option { background:#111827; color:var(--text); }
+
+    /* CHIPS */
+    .chip-wrap { display:flex; flex-wrap:wrap; gap:7px; margin-top:8px; }
+    .chip {
+      padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+      font-size:12px; font-weight:600; color:var(--text2); cursor:pointer;
+      transition:all 0.2s; background:var(--panel); user-select:none;
+      font-family:var(--font);
+    }
+    .chip:hover { border-color:rgba(16,163,127,0.5); color:var(--green); }
+    .chip.on { background:rgba(16,163,127,0.12); border-color:var(--green); color:var(--green); }
+
+    /* CAP GRID */
+    .cap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:8px; }
+    .cap-card {
+      padding:14px 10px; background:var(--panel); border:1px solid var(--border2);
+      border-radius:10px; cursor:pointer; transition:all 0.25s; text-align:center;
+      position:relative; overflow:hidden;
+    }
+    .cap-card:hover { border-color:var(--border); transform:translateY(-2px); background:var(--panel2); }
+    .cap-card.on { border-color:var(--green); background:rgba(16,163,127,0.1); }
+    .cap-icon { font-size:18px; margin-bottom:5px; display:block; }
+    .cap-name { font-size:11px; font-weight:700; color:var(--text2); line-height:1.3; }
+    .cap-card.on .cap-name { color:var(--green); }
+
+    /* TOGGLE */
+    .tog-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:13px 16px; background:var(--panel); border:1px solid var(--border2);
+      border-radius:10px; margin-bottom:7px; transition:border-color 0.2s;
+    }
+    .tog-row:hover { border-color:var(--border); }
+    .tog-row.tog-on { border-color:rgba(16,163,127,0.25); }
+    .tog-text strong { display:block; font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+    .tog-text span { font-size:11px; color:var(--text3); }
+    .tog-text code {
+      font-family:var(--mono); font-size:11px;
+      background:rgba(16,163,127,0.1); border:1px solid rgba(16,163,127,0.2);
+      padding:1px 6px; border-radius:4px; color:var(--green);
+    }
+    .tog-switch {
+      width:40px; height:22px; background:rgba(255,255,255,0.06);
+      border:1px solid var(--border); border-radius:11px; cursor:pointer;
+      position:relative; flex-shrink:0; transition:all 0.3s;
+    }
+    .tog-switch::after {
+      content:''; position:absolute; width:14px; height:14px;
+      border-radius:50%; background:var(--text3); top:3px; left:3px; transition:all 0.3s;
+    }
+    .tog-switch.on { background:rgba(16,163,127,0.2); border-color:var(--green); }
+    .tog-switch.on::after { background:var(--green); left:19px; box-shadow:0 0 8px rgba(16,163,127,0.5); }
+
+    /* MEMORY OPTIONS */
+    .mem-opt {
+      display:flex; gap:14px; align-items:flex-start;
+      padding:15px 17px; background:var(--panel); border:1px solid var(--border2);
+      border-radius:10px; margin-bottom:7px; cursor:pointer; transition:all 0.25s;
+    }
+    .mem-opt:hover { border-color:var(--border); background:var(--panel2); }
+    .mem-opt.on { border-color:var(--green); background:rgba(16,163,127,0.08); }
+    .mem-radio {
+      width:18px; height:18px; border-radius:50%;
+      border:2px solid var(--border); margin-top:2px; flex-shrink:0;
+      transition:all 0.25s; position:relative;
+    }
+    .mem-opt.on .mem-radio { border-color:var(--green); }
+    .mem-opt.on .mem-radio::after {
+      content:''; position:absolute; top:3px; left:3px;
+      width:8px; height:8px; border-radius:50%; background:var(--green);
+    }
+    .mem-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .mem-opt.on .mem-title { color:var(--green); }
+    .mem-desc { font-size:11px; color:var(--text3); line-height:1.5; }
+    .mem-badge {
+      display:inline-block; padding:2px 7px; border-radius:4px;
+      font-family:var(--mono); font-size:9px; font-weight:500; margin-top:5px;
+    }
+    .mem-badge.full { background:rgba(16,163,127,0.15); color:var(--green); border:1px solid rgba(16,163,127,0.3); }
+    .mem-badge.simple { background:rgba(29,155,240,0.12); color:var(--blue); border:1px solid rgba(29,155,240,0.25); }
+    .mem-badge.manual { background:rgba(139,92,246,0.12); color:var(--purple); border:1px solid rgba(139,92,246,0.25); }
+
+    /* GPT SPECIFIC: TRAINING & KNOWLEDGE */
+    .training-card {
+      background:var(--panel); border:1px solid var(--border2);
+      border-radius:10px; padding:16px; margin-bottom:9px;
+      transition:all 0.25s;
+    }
+    .training-card:hover { border-color:var(--border); }
+    .training-title {
+      font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .training-tag {
+      font-family:var(--mono); font-size:9px; padding:2px 7px;
+      border-radius:4px; background:rgba(245,158,11,0.1);
+      color:var(--amber); border:1px solid rgba(245,158,11,0.2);
+    }
+
+    /* TAG INPUT */
+    .tag-input-wrap {
+      display:flex; flex-wrap:wrap; gap:7px;
+      padding:10px 13px; background:rgba(255,255,255,0.04);
+      border:1px solid var(--border); border-radius:10px; cursor:text;
+      min-height:44px; transition:border-color 0.2s;
+    }
+    .tag-input-wrap:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(16,163,127,0.08); }
+    .tag-item {
+      display:flex; align-items:center; gap:5px;
+      padding:3px 10px 3px 10px; background:rgba(16,163,127,0.12);
+      border:1px solid rgba(16,163,127,0.3); border-radius:6px;
+      font-size:12px; color:var(--green); font-weight:600;
+    }
+    .tag-remove { cursor:pointer; color:rgba(16,163,127,0.6); font-size:14px; line-height:1; }
+    .tag-remove:hover { color:var(--green); }
+    .tag-input-real {
+      border:none; outline:none; background:transparent;
+      font-family:var(--font); font-size:13px; color:var(--text); min-width:120px; flex:1;
+    }
+    .tag-input-real::placeholder { color:var(--text3); }
+
+    /* NAV BUTTONS */
+    .nav-btns {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:44px; padding-top:28px; border-top:1px solid var(--border2);
+    }
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:11px 24px; border-radius:10px; font-family:var(--font);
+      font-size:13px; font-weight:700; cursor:pointer; transition:all 0.25s;
+      border:none; letter-spacing:0.5px;
+    }
+    .btn-ghost {
+      background:transparent; color:var(--text2); border:1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color:var(--border); background:var(--panel2); color:var(--text); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green) 0%, rgba(16,163,127,0.8) 100%);
+      color:#fff; box-shadow:0 4px 16px rgba(16,163,127,0.3);
+    }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(16,163,127,0.4); }
+    .btn-generate {
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color:#fff; padding:14px 32px; font-size:15px;
+      box-shadow:0 6px 24px rgba(16,163,127,0.35);
+    }
+    .btn-generate:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(16,163,127,0.45); }
+
+    /* SECTION DIVIDER */
+    .sect-div {
+      display:flex; align-items:center; gap:12px;
+      margin:28px 0 22px; font-family:var(--mono); font-size:10px;
+      color:var(--text3); letter-spacing:2px; text-transform:uppercase;
+    }
+    .sect-div::before, .sect-div::after { content:''; flex:1; height:1px; background:var(--border2); }
+
+    /* ADD ITEM ROW */
+    .add-row {
+      display:flex; gap:10px; margin-top:10px;
+    }
+    .add-row input { flex:1; }
+    .btn-add {
+      padding:10px 18px; border-radius:9px; background:rgba(16,163,127,0.1);
+      border:1px solid rgba(16,163,127,0.25); color:var(--green);
+      font-family:var(--font); font-size:13px; font-weight:700; cursor:pointer;
+      transition:all 0.2s; white-space:nowrap;
+    }
+    .btn-add:hover { background:rgba(16,163,127,0.18); }
+    .items-list { margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+    .item-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:9px 14px; background:var(--panel); border:1px solid var(--border2); border-radius:8px;
+    }
+    .item-text { font-size:13px; color:var(--text2); flex:1; }
+    .item-del {
+      width:22px; height:22px; border-radius:6px; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      color:var(--text3); font-size:14px; transition:all 0.2s;
+    }
+    .item-del:hover { background:var(--rose-soft); border-color:rgba(244,63,94,0.3); color:var(--rose); }
+
+    /* SUMMARY */
+    .sum-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:28px; }
+    .sum-card {
+      padding:16px 18px; background:var(--panel); border:1px solid var(--border2); border-radius:10px;
+    }
+    .sum-label { font-family:var(--mono); font-size:9px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+    .sum-val { font-size:15px; font-weight:700; color:var(--text); }
+
+    /* OUTPUT */
+    .output-tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+    .tab-btn {
+      padding:7px 18px; border-radius:8px; border:1px solid var(--border);
+      background:transparent; color:var(--text2); font-family:var(--font);
+      font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;
+    }
+    .tab-btn.on { background:rgba(16,163,127,0.12); border-color:var(--green); color:var(--green); }
+    .out-block { display:none; }
+    .out-block.active { display:block; }
+    .out-wrap {
+      background: var(--out-bg); border:1px solid var(--border); border-radius:12px;
+      position:relative; overflow:hidden;
+    }
+    .out-wrap::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:1px;
+      background:linear-gradient(90deg, transparent, var(--green), transparent); opacity:0.3;
+    }
+    .out-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 18px; border-bottom:1px solid var(--border2);
+    }
+    .out-title { font-family:var(--mono); font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+    .out-actions { display:flex; gap:8px; }
+    .btn-copy, .btn-dl {
+      padding:5px 14px; border-radius:7px; font-family:var(--font);
+      font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:5px;
+    }
+    .btn-copy { background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text2); }
+    .btn-copy:hover { background:rgba(255,255,255,0.1); color:var(--text); }
+    .btn-copy.ok { background:rgba(16,163,127,0.15); border-color:var(--green); color:var(--green); }
+    .btn-dl { background:rgba(16,163,127,0.1); border:1px solid rgba(16,163,127,0.25); color:var(--green); }
+    .btn-dl:hover { background:rgba(16,163,127,0.18); }
+    .out-code {
+      padding:20px 22px; font-family:var(--mono); font-size:12.5px;
+      color:rgba(240,246,252,0.85); white-space:pre-wrap; line-height:1.75;
+      max-height:520px; overflow-y:auto; word-break:break-word;
+    }
+
+    /* GPT GUIDE */
+    .gpt-guide {
+      background:rgba(16,163,127,0.06); border:1px solid rgba(16,163,127,0.15);
+      border-radius:12px; padding:22px; margin-bottom:26px;
+    }
+    .gpt-guide-title {
+      font-size:14px; font-weight:800; color:var(--green); margin-bottom:14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .gpt-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .g-step { display:flex; gap:10px; }
+    .g-num {
+      width:26px; height:26px; border-radius:50%;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:800; flex-shrink:0;
+      box-shadow:0 3px 10px rgba(16,163,127,0.3);
+    }
+    .g-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .g-desc { font-size:11px; color:var(--text3); line-height:1.55; }
+
+    /* TOKEN METER */
+    .token-meter {
+      display:flex; align-items:center; gap:12px; padding:12px 16px;
+      background:var(--panel); border:1px solid var(--border2); border-radius:9px; margin-top:10px;
+    }
+    .token-label { font-family:var(--mono); font-size:10px; color:var(--text3); letter-spacing:1px; flex-shrink:0; }
+    .token-track { flex:1; height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+    .token-fill {
+      height:100%; border-radius:2px; transition:width 0.5s;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+    }
+    .token-count { font-family:var(--mono); font-size:11px; color:var(--text2); flex-shrink:0; }
+
+    /* HINTS */
+    .hint-box {
+      padding:13px 16px; border-radius:9px; margin-top:8px; font-size:12px; line-height:1.6;
+    }
+    .hint-box.info { background:rgba(29,155,240,0.08); border:1px solid rgba(29,155,240,0.2); color:rgba(29,155,240,0.9); }
+    .hint-box.warn { background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); color:rgba(245,158,11,0.9); }
+    .hint-box.tip { background:rgba(16,163,127,0.08); border:1px solid rgba(16,163,127,0.2); color:rgba(16,163,127,0.9); }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .layout { grid-template-columns:1fr; }
+      .sidebar { position:relative; height:auto; flex-direction:row; overflow-x:auto; padding:14px; }
+      .sidebar-brand, .sidebar-footer, .nav-connector { display:none; }
+      .step-nav { display:flex; flex-direction:row; padding:0; gap:4px; }
+      .nav-item-inner { padding:7px 12px; }
+      .nav-name { font-size:10px; }
+      .main { padding:24px 18px; }
+      .cap-grid, .gpt-steps { grid-template-columns:repeat(2,1fr); }
+      .sum-grid, .field.row2, .field.row3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <div class="logo-icon">🤖</div>
+        <div>
+          <div class="brand-title">My <em>GPT</em><br>Prompt Builder</div>
+          <div class="brand-sub">Personal AI Config</div>
+        </div>
+      </div>
+      <div class="brand-badge">
+        <div class="badge-dot"></div>
+        ChatGPT · Custom GPT
+      </div>
+    </div>
+
+    <nav class="step-nav" id="stepNav">
+      <div class="nav-item active" id="nav1" onclick="doSwitch(1)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">01</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 01</div>
+            <div class="nav-name">Danh Tính GPT</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-connector"></div>
+      <div class="nav-item" id="nav2" onclick="doSwitch(2)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">02</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 02</div>
+            <div class="nav-name">Nhân Cách & Giọng Điệu</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-connector"></div>
+      <div class="nav-item" id="nav3" onclick="doSwitch(3)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">03</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 03</div>
+            <div class="nav-name">Đào Tạo & Tri Thức</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-connector"></div>
+      <div class="nav-item" id="nav4" onclick="doSwitch(4)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">04</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 04</div>
+            <div class="nav-name">Bộ Nhớ Dài Hạn</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-connector"></div>
+      <div class="nav-item" id="nav5" onclick="doSwitch(5)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">05</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 05</div>
+            <div class="nav-name">Năng Lực & Giới Hạn</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-connector"></div>
+      <div class="nav-item" id="nav6" onclick="doSwitch(6)">
+        <div class="nav-item-inner">
+          <div class="nav-bullet">06</div>
+          <div class="nav-text">
+            <div class="nav-label">Phase 06</div>
+            <div class="nav-name">Xuất Prompt & Hướng Dẫn</div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="prog-info">
+        <span>TIẾN ĐỘ</span><span id="progPct">0%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Chuyển giao diện sáng/tối">
+        <div class="theme-toggle-label">
+          <svg id="themeIcon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.3"/>
+            <line x1="8" y1="1" x2="8" y2="2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="8" y1="13.5" x2="8" y2="15" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="1" y1="8" x2="2.5" y2="8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="13.5" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="2.93" y1="2.93" x2="3.99" y2="3.99" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="12.01" y1="12.01" x2="13.07" y2="13.07" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="2.93" y1="13.07" x2="3.99" y2="12.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="12.01" y1="3.99" x2="13.07" y2="2.93" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span id="themeLabel">Giao diện sáng</span>
+        </div>
+        <div class="theme-pill"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+
+    <!-- ══ PANEL 1: IDENTITY ══ -->
+    <div class="panel active" id="p1">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 01 · Identity</div>
+        <h2 class="ph-title"><strong>Danh Tính</strong><br>& Thông Tin Cơ Bản</h2>
+        <p class="ph-desc">Xác định tên, chuyên môn và mục tiêu. Đây là nền tảng của mọi Custom GPT — GPT cần "biết mình là ai" ngay từ đầu.</p>
+      </div>
+
+      <div class="step-visual">
+        <div class="visual-label">Sơ Đồ · GPT Identity</div>
+        <div class="visual-svg-wrap">
+          <svg width="520" height="130" viewBox="0 0 520 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="200" y="40" width="120" height="50" rx="10" fill="rgba(16,163,127,0.08)" stroke="rgba(16,163,127,0.35)" stroke-width="1"/>
+            <text x="260" y="62" text-anchor="middle" font-family="DM Mono" font-size="11" fill="#10a37f">MY GPT</text>
+            <text x="260" y="76" text-anchor="middle" font-family="DM Mono" font-size="9" fill="rgba(16,163,127,0.5)">v1.0</text>
+            <circle cx="260" cy="65" r="34" fill="none" stroke="rgba(16,163,127,0.15)" stroke-width="1" stroke-dasharray="3,5">
+              <animateTransform attributeName="transform" type="rotate" from="0 260 65" to="360 260 65" dur="18s" repeatCount="indefinite"/>
+            </circle>
+
+            <g transform="translate(80,38)">
+              <circle r="25" fill="rgba(139,92,246,0.07)" stroke="rgba(139,92,246,0.3)" stroke-width="1">
+                <animate attributeName="r" values="25;29;25" dur="4s" repeatCount="indefinite"/>
+              </circle>
+              <text x="0" y="-3" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#8b5cf6">DOMAIN</text>
+              <text x="0" y="9" text-anchor="middle" font-family="DM Mono" font-size="8" fill="rgba(139,92,246,0.5)">lĩnh vực</text>
+            </g>
+            <line x1="105" y1="46" x2="200" y2="57" stroke="rgba(139,92,246,0.25)" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="0;-14" dur="1.5s" repeatCount="indefinite"/></line>
+
+            <g transform="translate(80,95)">
+              <circle r="23" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.3)" stroke-width="1">
+                <animate attributeName="r" values="23;27;23" dur="5s" repeatCount="indefinite" begin="0.5s"/>
+              </circle>
+              <text x="0" y="-3" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#f59e0b">USER</text>
+              <text x="0" y="9" text-anchor="middle" font-family="DM Mono" font-size="8" fill="rgba(245,158,11,0.5)">profile</text>
+            </g>
+            <line x1="103" y1="88" x2="200" y2="72" stroke="rgba(245,158,11,0.25)" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="0;-14" dur="2s" repeatCount="indefinite"/></line>
+
+            <g transform="translate(440,38)">
+              <circle r="25" fill="rgba(29,155,240,0.07)" stroke="rgba(29,155,240,0.3)" stroke-width="1">
+                <animate attributeName="r" values="25;29;25" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+              </circle>
+              <text x="0" y="-3" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#1d9bf0">GOAL</text>
+              <text x="0" y="9" text-anchor="middle" font-family="DM Mono" font-size="8" fill="rgba(29,155,240,0.5)">mục tiêu</text>
+            </g>
+            <line x1="320" y1="57" x2="415" y2="46" stroke="rgba(29,155,240,0.25)" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="0;-14" dur="1.8s" repeatCount="indefinite"/></line>
+
+            <g transform="translate(440,95)">
+              <circle r="23" fill="rgba(16,163,127,0.07)" stroke="rgba(16,163,127,0.25)" stroke-width="1">
+                <animate attributeName="r" values="23;27;23" dur="4.5s" repeatCount="indefinite" begin="1.5s"/>
+              </circle>
+              <text x="0" y="-3" text-anchor="middle" font-family="DM Mono" font-size="9" fill="#10a37f">LANGUAGE</text>
+              <text x="0" y="9" text-anchor="middle" font-family="DM Mono" font-size="8" fill="rgba(16,163,127,0.5)">ngôn ngữ</text>
+            </g>
+            <line x1="320" y1="72" x2="417" y2="88" stroke="rgba(16,163,127,0.2)" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="0;-14" dur="2.2s" repeatCount="indefinite"/></line>
+          </svg>
+        </div>
+      </div>
+
+      <div class="field row2">
+        <div>
+          <label>Tên GPT <span class="req">*</span></label>
+          <input type="text" id="gptName" placeholder="Atlas, Nova, Coach AI, LexGPT…" maxlength="30">
+        </div>
+        <div>
+          <label>Phiên bản</label>
+          <input type="text" id="gptVer" placeholder="1.0" value="1.0" maxlength="10">
+        </div>
+      </div>
+      <div class="field">
+        <label>Lĩnh vực chuyên môn <span class="req">*</span></label>
+        <input type="text" id="gptDomain" placeholder="Vd: Lập trình Python, Marketing, Tâm lý học, Y tế…">
+        <div class="chip-wrap" id="domainChips" style="margin-top:10px">
+          <div class="chip" onclick="toggleDomain(this)">Lập trình & Kỹ thuật phần mềm</div>
+          <div class="chip" onclick="toggleDomain(this)">Marketing & Tăng trưởng</div>
+          <div class="chip" onclick="toggleDomain(this)">Giáo dục & Đào tạo</div>
+          <div class="chip" onclick="toggleDomain(this)">Kinh doanh & Khởi nghiệp</div>
+          <div class="chip" onclick="toggleDomain(this)">Y tế & Sức khỏe</div>
+          <div class="chip" onclick="toggleDomain(this)">Pháp lý & Hành chính</div>
+          <div class="chip" onclick="toggleDomain(this)">Tài chính & Đầu tư</div>
+          <div class="chip" onclick="toggleDomain(this)">Sáng tạo nội dung</div>
+          <div class="chip" onclick="toggleDomain(this)">Nghiên cứu & Phân tích dữ liệu</div>
+          <div class="chip" onclick="toggleDomain(this)">Hành chính công & Chính sách</div>
+          <div class="chip" onclick="toggleDomain(this)">Tổng hợp & Tham mưu</div>
+          <div class="chip" onclick="toggleDomain(this)">Chuyển đổi số</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Mục tiêu sử dụng <span class="req">*</span></label>
+        <textarea id="gptGoal" rows="3" placeholder="Vd: Hỗ trợ tôi giải quyết bài toán kỹ thuật hàng ngày, lưu lại quyết định thiết kế và tư duy qua các dự án dài hạn…"></textarea>
+      </div>
+
+      <div class="sect-div"><span>Hồ Sơ Người Dùng</span></div>
+      <div class="field row2">
+        <div>
+          <label>Tên / Nickname</label>
+          <input type="text" id="userName" placeholder="GPT sẽ gọi bạn là…">
+        </div>
+        <div>
+          <label>Nghề nghiệp / Vai trò</label>
+          <input type="text" id="userRole" placeholder="Senior Dev, Founder, Giảng viên…">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ngôn ngữ ưu tiên</label>
+        <div class="chip-wrap" id="langChips">
+          <div class="chip on" onclick="toggleChip(this)">Tiếng Việt</div>
+          <div class="chip" onclick="toggleChip(this)">English</div>
+          <div class="chip" onclick="toggleChip(this)">Song ngữ Việt-Anh</div>
+          <div class="chip" onclick="toggleChip(this)">Tự động theo ngữ cảnh</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <div></div>
+        <button class="btn btn-primary" onclick="nextStep(1)">Tiếp theo →</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL 2: PERSONALITY ══ -->
+    <div class="panel" id="p2">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 02 · Personality</div>
+        <h2 class="ph-title"><strong>Nhân Cách</strong><br>& Phong Cách Giao Tiếp</h2>
+        <p class="ph-desc">Quyết định GPT sẽ "cảm giác" như thế nào. Nhân cách nhất quán tạo trải nghiệm đáng tin cậy.</p>
+      </div>
+
+      <div class="field">
+        <label>Giọng điệu</label>
+        <div class="chip-wrap" id="toneChips">
+          <div class="chip on" onclick="toggleChip(this)">Chuyên nghiệp · Rõ ràng</div>
+          <div class="chip" onclick="toggleChip(this)">Thân thiện · Gần gũi</div>
+          <div class="chip" onclick="toggleChip(this)">Trực tiếp · Không vòng vo</div>
+          <div class="chip" onclick="toggleChip(this)">Học thuật · Sâu sắc</div>
+          <div class="chip" onclick="toggleChip(this)">Giản dị · Dễ hiểu</div>
+          <div class="chip" onclick="toggleChip(this)">Hài hước · Sáng tạo</div>
+          <div class="chip" onclick="toggleChip(this)">Mentor · Định hướng</div>
+          <div class="chip" onclick="toggleChip(this)">Socratic · Đặt câu hỏi</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Độ dài phản hồi</label>
+        <select id="respLen">
+          <option value="concise">Ngắn gọn — chỉ điểm cốt lõi, tránh dài dòng</option>
+          <option value="balanced" selected>Cân bằng — ngắn khi đơn giản, chi tiết khi cần</option>
+          <option value="detailed">Chi tiết — giải thích đầy đủ kèm ví dụ cụ thể</option>
+          <option value="adaptive">Thích ứng — hỏi trước khi trả lời dài</option>
+        </select>
+      </div>
+
+      <div class="field row2">
+        <div>
+          <label>GPT tự xưng là <span class="note">cách GPT gọi bản thân</span></label>
+          <input type="text" id="selfRef" placeholder="tôi, mình, AI, GPT…" value="tôi">
+        </div>
+        <div>
+          <label>Gọi bạn là <span class="note">cách GPT gọi user</span></label>
+          <input type="text" id="userRef" placeholder="bạn, anh, chị, thầy…" value="bạn">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Đặc điểm hành vi</label>
+        <div class="tog-row" id="tr-proactive">
+          <div class="tog-text">
+            <strong>🚀 Chủ động đề xuất</strong>
+            <span>Tự đề xuất cải thiện, tóm tắt hoặc bước tiếp theo khi thấy cơ hội</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-proactive')"></div>
+        </div>
+        <div class="tog-row" id="tr-confirm">
+          <div class="tog-text">
+            <strong>✅ Hỏi xác nhận trước khi xóa</strong>
+            <span>Luôn xin phép trước khi reset memory hoặc xóa dữ liệu quan trọng</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-confirm')"></div>
+        </div>
+        <div class="tog-row" id="tr-conflict">
+          <div class="tog-text">
+            <strong>⚠️ Cảnh báo mâu thuẫn</strong>
+            <span>Báo động khi thông tin mới mâu thuẫn với dữ liệu đã lưu</span>
+          </div>
+          <div class="tog-switch on" onclick="toggle(this,'tr-conflict')"></div>
+        </div>
+        <div class="tog-row" id="tr-nosrc">
+          <div class="tog-text">
+            <strong>🧠 Tri thức nội tại</strong>
+            <span>Chỉ dùng kiến thức đã tích lũy, không trích dẫn URL bên ngoài</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-nosrc')"></div>
+        </div>
+        <div class="tog-row" id="tr-stepbystep">
+          <div class="tog-text">
+            <strong>📋 Tư duy theo bước</strong>
+            <span>Luôn lý giải từng bước trước khi đưa ra kết luận (Chain of Thought)</span>
+          </div>
+          <div class="tog-switch on" onclick="toggle(this,'tr-stepbystep')"></div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="nextStep(0,1)">← Quay lại</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Tiếp theo →</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL 3: TRAINING & KNOWLEDGE ══ -->
+    <div class="panel" id="p3">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 03 · Knowledge</div>
+        <h2 class="ph-title"><strong>Đào Tạo</strong><br>& Tri Thức Nền Tảng</h2>
+        <p class="ph-desc">Xây dựng "bộ não" cho GPT — tri thức chuyên môn, ngữ cảnh dự án, và dữ liệu cá nhân hóa để GPT hiểu sâu về lĩnh vực của bạn.</p>
+      </div>
+
+      <div class="gpt-guide">
+        <div class="gpt-guide-title">📚 Cách đào tạo dữ liệu cho Custom GPT</div>
+        <div class="gpt-steps">
+          <div class="g-step">
+            <div class="g-num">1</div>
+            <div>
+              <div class="g-title">Paste vào Instructions</div>
+              <div class="g-desc">System prompt được generate ở bước 6 → paste vào ô "Instructions" trong GPT Builder</div>
+            </div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">2</div>
+            <div>
+              <div class="g-title">Upload Knowledge Files</div>
+              <div class="g-desc">Upload PDF, TXT, DOCX chứa tài liệu chuyên môn vào mục "Knowledge" để GPT tham chiếu</div>
+            </div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">3</div>
+            <div>
+              <div class="g-title">Memory qua Conversation</div>
+              <div class="g-desc">Dùng lệnh <code>/learn</code> trong chat để GPT ghi nhớ thông tin quan trọng dài hạn</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tri thức nền tảng <span class="note">paste tài liệu, quy trình, kiến thức chuyên môn</span></label>
+        <textarea id="baseKnow" rows="6" placeholder="Ví dụ:&#10;- Framework chúng ta dùng: Next.js 14, Prisma, PostgreSQL&#10;- Quy trình review code: PR phải có 2 approvals&#10;- Domain model: User > Workspace > Project > Task&#10;- Các quy tắc business: ..."></textarea>
+        <div class="hint-box tip" style="margin-top:8px">
+          💡 Đây sẽ được nhúng trực tiếp vào system prompt. Nội dung ngắn gọn, có cấu trúc — GPT sẽ hiểu tốt hơn.
+        </div>
+      </div>
+
+      <div class="sect-div"><span>Chủ Đề Đào Tạo</span></div>
+      <div class="field">
+        <label>Chủ đề & từ khóa quan trọng <span class="note">Enter để thêm</span></label>
+        <div class="tag-input-wrap" id="topicWrap" onclick="document.getElementById('topicInput').focus()">
+          <input type="text" class="tag-input-real" id="topicInput" placeholder="Thêm chủ đề: vd 'Clean Code', 'OKR', 'Scrum'…" onkeydown="addTag(event,'topicWrap','topicInput','topicTags')">
+        </div>
+      </div>
+
+      <div class="sect-div"><span>Ngữ Cảnh Hiện Tại</span></div>
+      <div class="field">
+        <label>Dự án / Công việc đang thực hiện</label>
+        <textarea id="currentProject" rows="3" placeholder="Vd: Đang xây dựng hệ thống quản lý nhân sự cho công ty 500 người, tech stack: React + Node.js + MySQL, deadline Q2/2025…"></textarea>
+      </div>
+      <div class="field">
+        <label>Vấn đề / Thách thức đang gặp</label>
+        <textarea id="currentChallenge" rows="2" placeholder="Vd: Bottleneck ở tầng DB, cần optimize query, team mới join chưa quen codebase…"></textarea>
+      </div>
+
+      <div class="sect-div"><span>Tài Liệu Tham Khảo</span></div>
+      <div class="training-card">
+        <div class="training-title">
+          📄 Loại file nên upload lên GPT Knowledge
+          <span class="training-tag">GPT Builder → Knowledge</span>
+        </div>
+        <div class="chip-wrap" id="knowledgeTypes">
+          <div class="chip on" onclick="this.classList.toggle('on')">PDF tài liệu kỹ thuật</div>
+          <div class="chip" onclick="this.classList.toggle('on')">TXT / Markdown notes</div>
+          <div class="chip" onclick="this.classList.toggle('on')">DOCX quy trình làm việc</div>
+          <div class="chip" onclick="this.classList.toggle('on')">CSV data mẫu</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Slide trình bày</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Code snippets (TXT)</div>
+          <div class="chip on" onclick="this.classList.toggle('on')">FAQ & Hướng dẫn</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Template & Biểu mẫu</div>
+        </div>
+        <div class="hint-box info" style="margin-top:10px">
+          ℹ️ GPT hỗ trợ tối đa 20 file, mỗi file ≤ 512MB. Nên dùng PDF/TXT cho văn bản thuần, tránh ảnh scan.
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="nextStep(0,2)">← Quay lại</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Tiếp theo →</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL 4: LONG-TERM MEMORY ══ -->
+    <div class="panel" id="p4">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 04 · Memory</div>
+        <h2 class="ph-title"><strong>Bộ Nhớ</strong><br>Dài Hạn</h2>
+        <p class="ph-desc">ChatGPT không có native long-term memory theo mặc định — nhưng bạn có thể mô phỏng bộ nhớ dài hạn qua các kỹ thuật dưới đây.</p>
+      </div>
+
+      <div class="hint-box warn" style="margin-bottom:22px">
+        ⚠️ ChatGPT Plus có tính năng Memory, nhưng Custom GPT cần cấu hình riêng. Prompt dưới đây dạy GPT cách xử lý memory qua conversation.
+      </div>
+
+      <div class="field">
+        <label>Chế độ bộ nhớ</label>
+        <div class="mem-opt on" id="mo-full" onclick="selectMem('full')">
+          <div class="mem-radio"></div>
+          <div>
+            <div class="mem-title">Full Memory Engine</div>
+            <div class="mem-desc">GPT tự động đánh dấu thông tin quan trọng bằng <code>⟨MEM⟩</code>, tạo Memory Snapshot khi kết thúc phiên, và đọc lại snapshot ở đầu phiên mới. Mạnh nhất, yêu cầu bạn paste snapshot.</div>
+            <span class="mem-badge full">Khuyên dùng · Dài hạn nhất</span>
+          </div>
+        </div>
+        <div class="mem-opt" id="mo-chatgpt" onclick="selectMem('chatgpt')">
+          <div class="mem-radio"></div>
+          <div>
+            <div class="mem-title">ChatGPT Memory Plugin</div>
+            <div class="mem-desc">Tận dụng tính năng Memory có sẵn của ChatGPT Plus. GPT chủ động yêu cầu save_memory khi gặp thông tin quan trọng.</div>
+            <span class="mem-badge simple">ChatGPT Plus Only</span>
+          </div>
+        </div>
+        <div class="mem-opt" id="mo-manual" onclick="selectMem('manual')">
+          <div class="mem-radio"></div>
+          <div>
+            <div class="mem-title">Manual Context</div>
+            <div class="mem-desc">Người dùng tự dán ngữ cảnh vào đầu mỗi phiên. Đơn giản, không cần cài đặt, phù hợp với workflow tự quản lý.</div>
+            <span class="mem-badge manual">Linh hoạt nhất</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect-div"><span>Ưu Tiên Ghi Nhớ</span></div>
+      <div class="field">
+        <label>GPT nên ưu tiên ghi nhớ những gì?</label>
+        <div class="chip-wrap" id="memPrioChips">
+          <div class="chip on" onclick="this.classList.toggle('on')">Quyết định & lý do</div>
+          <div class="chip on" onclick="this.classList.toggle('on')">Tiến độ dự án</div>
+          <div class="chip on" onclick="this.classList.toggle('on')">Sở thích làm việc</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Lỗi đã gặp & cách fix</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Kiến trúc hệ thống</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Phong cách code</div>
+          <div class="chip on" onclick="this.classList.toggle('on')">Kết luận từ thảo luận</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Thông tin đồng đội/khách hàng</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Mục tiêu & deadline</div>
+          <div class="chip" onclick="this.classList.toggle('on')">Feedback & cải tiến</div>
+        </div>
+      </div>
+
+      <div class="sect-div"><span>Lệnh Kết Thúc Phiên</span></div>
+      <div class="field">
+        <label>Lệnh trigger xuất memory snapshot</label>
+        <div class="chip-wrap" id="endCmdChips">
+          <div class="chip on" onclick="toggleChip(this)">"kết thúc phiên"</div>
+          <div class="chip" onclick="toggleChip(this)">"lưu phiên"</div>
+          <div class="chip" onclick="toggleChip(this)">/endsession</div>
+          <div class="chip" onclick="toggleChip(this)">/save</div>
+          <div class="chip" onclick="toggleChip(this)">/snapshot</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Chu kỳ làm sạch memory</label>
+        <select id="memClean">
+          <option value="never">Giữ toàn bộ (không xóa)</option>
+          <option value="monthly" selected>Mỗi tháng — tóm gọn cũ, giữ mới</option>
+          <option value="weekly">Mỗi tuần — rolling 4 tuần gần nhất</option>
+          <option value="manual">Thủ công — chỉ khi tôi yêu cầu</option>
+        </select>
+      </div>
+
+      <div class="sect-div"><span>Lệnh Hệ Thống (Slash Commands)</span></div>
+      <div class="field">
+        <div class="tog-row" id="tr-status">
+          <div class="tog-text">
+            <strong><code>/status</code></strong>
+            <span>Báo cáo trạng thái memory và ngữ cảnh hiện tại</span>
+          </div>
+          <div class="tog-switch on" onclick="toggle(this,'tr-status')"></div>
+        </div>
+        <div class="tog-row" id="tr-recap">
+          <div class="tog-text">
+            <strong><code>/recap</code></strong>
+            <span>Tóm tắt những gì đã thảo luận trong phiên này</span>
+          </div>
+          <div class="tog-switch on" onclick="toggle(this,'tr-recap')"></div>
+        </div>
+        <div class="tog-row" id="tr-learn">
+          <div class="tog-text">
+            <strong><code>/learn [nội dung]</code></strong>
+            <span>Ghi nhớ thủ công một thông tin cụ thể vào long-term memory</span>
+          </div>
+          <div class="tog-switch on" onclick="toggle(this,'tr-learn')"></div>
+        </div>
+        <div class="tog-row" id="tr-profile">
+          <div class="tog-text">
+            <strong><code>/profile</code></strong>
+            <span>Hiển thị toàn bộ hồ sơ người dùng đã ghi nhớ</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-profile')"></div>
+        </div>
+        <div class="tog-row" id="tr-reset">
+          <div class="tog-text">
+            <strong><code>/reset</code></strong>
+            <span>Xóa toàn bộ ngữ cảnh (yêu cầu xác nhận)</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-reset')"></div>
+        </div>
+        <div class="tog-row" id="tr-focus">
+          <div class="tog-text">
+            <strong><code>/focus [chủ đề]</code></strong>
+            <span>Chuyển GPT sang chế độ chuyên gia về một chủ đề cụ thể</span>
+          </div>
+          <div class="tog-switch" onclick="toggle(this,'tr-focus')"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lệnh tùy chỉnh <span class="note">thêm slash command riêng</span></label>
+        <div class="add-row">
+          <input type="text" id="customCmdInput" placeholder="Vd: /analyze → Phân tích chuyên sâu theo framework MECE">
+          <button class="btn-add" onclick="addItem('customCmdInput','customCmdList','customCmds')">+ Thêm</button>
+        </div>
+        <div class="items-list" id="customCmdList"></div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="nextStep(0,3)">← Quay lại</button>
+        <button class="btn btn-primary" onclick="nextStep(4)">Tiếp theo →</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL 5: CAPABILITIES ══ -->
+    <div class="panel" id="p5">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 05 · Capabilities</div>
+        <h2 class="ph-title"><strong>Năng Lực</strong><br>& Giới Hạn</h2>
+        <p class="ph-desc">Xác định GPT giỏi gì, không làm gì. Ranh giới rõ ràng giúp GPT tập trung và tránh "ảo giác" ngoài vùng chuyên môn.</p>
+      </div>
+
+      <div class="field">
+        <label>Năng lực cốt lõi <span class="note">chọn các module GPT sẽ thành thạo</span></label>
+        <div class="cap-grid" id="capGrid">
+          <div class="cap-card on" onclick="this.classList.toggle('on')"><span class="cap-icon">💻</span><div class="cap-name">Lập trình & Debug</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">📊</span><div class="cap-name">Phân tích dữ liệu</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">✍️</span><div class="cap-name">Viết & Chỉnh sửa</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">🧠</span><div class="cap-name">Tư duy & Phản biện</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">📋</span><div class="cap-name">Lập kế hoạch & OKR</div></div>
+          <div class="cap-card on" onclick="this.classList.toggle('on')"><span class="cap-icon">🔍</span><div class="cap-name">Nghiên cứu & Tổng hợp</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">🎯</span><div class="cap-name">Chiến lược & Định vị</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">📣</span><div class="cap-name">Marketing & Copywriting</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">🏛️</span><div class="cap-name">Pháp lý & Quy định</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">💰</span><div class="cap-name">Tài chính & Ngân sách</div></div>
+          <div class="cap-card" onclick="this.classList.toggle('on')"><span class="cap-icon">🎨</span><div class="cap-name">Thiết kế & UX</div></div>
+          <div class="cap-card on" onclick="this.classList.toggle('on')"><span class="cap-icon">🤝</span><div class="cap-name">Coaching & Feedback</div></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Kỹ năng cụ thể <span class="note">tool, framework, phương pháp</span></label>
+        <div class="add-row">
+          <input type="text" id="skillInput" placeholder="Vd: React, Figma, JTBD, Porter's 5 Forces…">
+          <button class="btn-add" onclick="addItem('skillInput','skillList','skills')">+ Thêm</button>
+        </div>
+        <div class="items-list" id="skillList"></div>
+      </div>
+
+      <div class="field">
+        <label>Giới hạn cứng <span class="note">GPT sẽ KHÔNG BAO GIỜ làm điều này</span></label>
+        <div class="add-row">
+          <input type="text" id="limitInput" placeholder="Vd: Không đưa ra lời khuyên y tế chẩn đoán bệnh">
+          <button class="btn-add" onclick="addItem('limitInput','limitList','limits')">+ Thêm</button>
+        </div>
+        <div class="items-list" id="limitList"></div>
+      </div>
+
+      <div class="field">
+        <label>Quy tắc bổ sung <span class="note">hành vi đặc biệt, format output, v.v.</span></label>
+        <textarea id="extraRules" rows="4" placeholder="Vd:&#10;- Khi tôi hỏi về code, luôn giải thích logic trước rồi mới viết code&#10;- Khi không chắc, nói thẳng thay vì đoán&#10;- Mỗi phân tích bắt đầu bằng TL;DR 1-2 dòng&#10;- Dùng emoji tiết kiệm, chỉ khi thực sự cần nhấn mạnh"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Câu chào mở đầu phiên</label>
+        <input type="text" id="sessionGreet" placeholder="Vd: Phiên mới! Hôm nay bạn muốn giải quyết vấn đề gì?">
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="nextStep(0,4)">← Quay lại</button>
+        <button class="btn btn-generate" onclick="generate()">✨ Tạo Prompt →</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL 6: OUTPUT ══ -->
+    <div class="panel" id="p6">
+      <div class="panel-head">
+        <div class="ph-badge">Phase 06 · Output</div>
+        <h2 class="ph-title"><strong>Prompt</strong><br>Đã Hoàn Thành ✨</h2>
+        <p class="ph-desc">Custom GPT của bạn đã sẵn sàng. Copy prompt và làm theo hướng dẫn để kích hoạt trên ChatGPT.</p>
+      </div>
+
+      <div class="gpt-guide" style="margin-bottom:24px">
+        <div class="gpt-guide-title">🚀 Cách cài đặt Custom GPT trên ChatGPT</div>
+        <div class="gpt-steps">
+          <div class="g-step">
+            <div class="g-num">1</div>
+            <div>
+              <div class="g-title">Mở GPT Builder</div>
+              <div class="g-desc">Vào chatgpt.com → Explore GPTs → Create → Configure tab</div>
+            </div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">2</div>
+            <div>
+              <div class="g-title">Paste System Prompt</div>
+              <div class="g-desc">Copy "System Prompt" bên dưới → paste vào ô "Instructions" trong GPT Builder</div>
+            </div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">3</div>
+            <div>
+              <div class="g-title">First-Run Onboarding</div>
+              <div class="g-desc">Khi đã tạo xong GPT, paste "First-Run" vào chat đầu tiên để GPT nhận hồ sơ của bạn</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sumGrid" class="sum-grid"></div>
+
+      <div class="output-tabs">
+        <button class="tab-btn on" onclick="switchTab('sys',this)">📋 System Prompt</button>
+        <button class="tab-btn" onclick="switchTab('onb',this)">🚀 First-Run Onboarding</button>
+        <button class="tab-btn" onclick="switchTab('sess',this)">🔄 Session Start</button>
+        <button class="tab-btn" onclick="switchTab('mem',this)">🧠 Memory Template</button>
+      </div>
+
+      <div class="out-block active" id="blk-sys">
+        <div class="out-wrap">
+          <div class="out-header">
+            <div class="out-title">SYSTEM PROMPT · Instructions</div>
+            <div class="out-actions">
+              <button class="btn-copy" onclick="copyOut('sysTxt',this)">
+                <svg viewBox="0 0 14 14" fill="none" width="12"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 9.5H2a1.5 1.5 0 01-1.5-1.5V2A1.5 1.5 0 012 .5h6A1.5 1.5 0 019.5 2v0" stroke="currentColor" stroke-width="1.3"/></svg>
+                Copy
+              </button>
+              <button class="btn-dl" onclick="dlOut('sysTxt','system-prompt.txt')">↓ Tải xuống</button>
+            </div>
+          </div>
+          <pre class="out-code" id="sysTxt"></pre>
+        </div>
+        <div class="token-meter">
+          <div class="token-label">TOKEN EST.</div>
+          <div class="token-track"><div class="token-fill" id="tokenFill" style="width:0%"></div></div>
+          <div class="token-count" id="tokenCount">0 / 8000</div>
+        </div>
+      </div>
+
+      <div class="out-block" id="blk-onb">
+        <div class="out-wrap">
+          <div class="out-header">
+            <div class="out-title">FIRST-RUN ONBOARDING · Paste lần đầu vào chat</div>
+            <div class="out-actions">
+              <button class="btn-copy" onclick="copyOut('onbTxt',this)">
+                <svg viewBox="0 0 14 14" fill="none" width="12"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 9.5H2a1.5 1.5 0 01-1.5-1.5V2A1.5 1.5 0 012 .5h6A1.5 1.5 0 019.5 2v0" stroke="currentColor" stroke-width="1.3"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+          <pre class="out-code" id="onbTxt"></pre>
+        </div>
+      </div>
+
+      <div class="out-block" id="blk-sess">
+        <div class="out-wrap">
+          <div class="out-header">
+            <div class="out-title">SESSION START · Dùng khi bắt đầu phiên mới</div>
+            <div class="out-actions">
+              <button class="btn-copy" onclick="copyOut('sessTxt',this)">
+                <svg viewBox="0 0 14 14" fill="none" width="12"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 9.5H2a1.5 1.5 0 01-1.5-1.5V2A1.5 1.5 0 012 .5h6A1.5 1.5 0 019.5 2v0" stroke="currentColor" stroke-width="1.3"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+          <pre class="out-code" id="sessTxt"></pre>
+        </div>
+      </div>
+
+      <div class="out-block" id="blk-mem">
+        <div class="out-wrap">
+          <div class="out-header">
+            <div class="out-title">MEMORY SNAPSHOT TEMPLATE · Format lưu trữ</div>
+            <div class="out-actions">
+              <button class="btn-copy" onclick="copyOut('memTxt',this)">
+                <svg viewBox="0 0 14 14" fill="none" width="12"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 9.5H2a1.5 1.5 0 01-1.5-1.5V2A1.5 1.5 0 012 .5h6A1.5 1.5 0 019.5 2v0" stroke="currentColor" stroke-width="1.3"/></svg>
+                Copy
+              </button>
+            </div>
+          </div>
+          <pre class="out-code" id="memTxt"></pre>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-ghost" onclick="nextStep(0,5)">← Chỉnh sửa lại</button>
+        <button class="btn btn-generate" onclick="generate()">🔄 Tạo lại</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── STATE ──
+  let skills = [], limits = [], customCmds = [], topicTags = [];
+  let memMode = 'full';
+
+  // ── THEME TOGGLE ──
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light');
+    document.getElementById('themeLabel').textContent = isLight ? 'Giao diện tối' : 'Giao diện sáng';
+    // swap icon: moon for dark, sun for light
+    const icon = document.getElementById('themeIcon');
+    if (isLight) {
+      icon.innerHTML = `<path d="M13.5 8.5a5.5 5.5 0 01-7.07 5.27A5.5 5.5 0 008.5 2.5a5.5 5.5 0 015 6z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    } else {
+      icon.innerHTML = `
+        <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="8" y1="1" x2="8" y2="2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="8" y1="13.5" x2="8" y2="15" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="1" y1="8" x2="2.5" y2="8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="13.5" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="2.93" y1="2.93" x2="3.99" y2="3.99" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="12.01" y1="12.01" x2="13.07" y2="13.07" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="2.93" y1="13.07" x2="3.99" y2="12.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="12.01" y1="3.99" x2="13.07" y2="2.93" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>`;
+    }
+    try { localStorage.setItem('gpt-theme', isLight ? 'light' : 'dark'); } catch(e){}
+  }
+
+  // Restore saved theme
+  try {
+    if (localStorage.getItem('gpt-theme') === 'light') {
+      document.documentElement.classList.add('light');
+      document.addEventListener('DOMContentLoaded', () => {
+        const lbl = document.getElementById('themeLabel');
+        const icon = document.getElementById('themeIcon');
+        if (lbl) lbl.textContent = 'Giao diện tối';
+        if (icon) icon.innerHTML = `<path d="M13.5 8.5a5.5 5.5 0 01-7.07 5.27A5.5 5.5 0 008.5 2.5a5.5 5.5 0 015 6z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`;
+      });
+    }
+  } catch(e) {}
+
+  // ── NAVIGATION ──
+  function doSwitch(n) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach((ni, i) => {
+      ni.classList.remove('active');
+      if (i < n - 1) ni.classList.add('done');
+      else ni.classList.remove('done');
+    });
+    document.getElementById('p' + n).classList.add('active');
+    document.getElementById('nav' + n).classList.add('active');
+    const pct = Math.round(((n - 1) / 5) * 100);
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('progPct').textContent = pct + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextStep(to, from) {
+    if (to > 0) {
+      if (to === 1 && !validate1()) return;
+      markDone(from || to);
+      doSwitch(to + 1);
+    } else {
+      doSwitch(from);
+    }
+  }
+
+  function markDone(n) {
+    const nav = document.getElementById('nav' + n);
+    if (nav) { nav.classList.add('done'); nav.querySelector('.nav-bullet').textContent = '✓'; }
+  }
+
+  function validate1() {
+    const name = document.getElementById('gptName').value.trim();
+    const domain = document.getElementById('gptDomain').value.trim();
+    const goal = document.getElementById('gptGoal').value.trim();
+    if (!name) { alert('Vui lòng nhập tên GPT'); return false; }
+    if (!domain) { alert('Vui lòng nhập lĩnh vực chuyên môn'); return false; }
+    if (!goal) { alert('Vui lòng nhập mục tiêu sử dụng'); return false; }
+    return true;
+  }
+
+  // ── CHIP TOGGLES ──
+  function toggleChip(el) {
+    const group = el.parentElement;
+    group.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+  }
+
+  function toggleDomain(el) {
+    document.getElementById('gptDomain').value = el.textContent.trim();
+    document.querySelectorAll('#domainChips .chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+  }
+
+  // ── TOGGLE ROWS ──
+  function toggle(sw, rowId) {
+    sw.classList.toggle('on');
+    const row = document.getElementById(rowId);
+    if (row) row.classList.toggle('tog-on', sw.classList.contains('on'));
+  }
+  function isOn(id) {
+    const el = document.getElementById(id);
+    return el ? el.querySelector('.tog-switch')?.classList.contains('on') : false;
+  }
+
+  // ── MEMORY MODE ──
+  function selectMem(mode) {
+    memMode = mode;
+    ['full','chatgpt','manual'].forEach(m => {
+      const el = document.getElementById('mo-' + m);
+      if (el) el.classList.toggle('on', m === mode);
+    });
+  }
+
+  // ── TAG INPUT ──
+  function addTag(e, wrapId, inputId, arrName) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const input = document.getElementById(inputId);
+      const val = input.value.trim().replace(/,$/,'');
+      if (!val) return;
+      if (arrName === 'topicTags') topicTags.push(val);
+      const wrap = document.getElementById(wrapId);
+      const tag = document.createElement('div');
+      tag.className = 'tag-item';
+      tag.innerHTML = `${val}<span class="tag-remove" onclick="removeTag(this,'${arrName}')">×</span>`;
+      wrap.insertBefore(tag, input);
+      input.value = '';
+    }
+  }
+
+  function removeTag(el, arrName) {
+    const text = el.parentElement.textContent.replace('×','').trim();
+    if (arrName === 'topicTags') topicTags = topicTags.filter(t => t !== text);
+    el.parentElement.remove();
+  }
+
+  // ── ADD ITEMS ──
+  function addItem(inputId, listId, arrName) {
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if (!val) return;
+    if (arrName === 'skills') skills.push(val);
+    if (arrName === 'limits') limits.push(val);
+    if (arrName === 'customCmds') customCmds.push(val);
+    const list = document.getElementById(listId);
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `<span class="item-text">${val}</span><div class="item-del" onclick="delItem(this,'${arrName}','${val.replace(/'/g,"\\'")}')">×</div>`;
+    list.appendChild(row);
+    input.value = '';
+  }
+
+  function delItem(el, arrName, val) {
+    if (arrName === 'skills') skills = skills.filter(s => s !== val);
+    if (arrName === 'limits') limits = limits.filter(l => l !== val);
+    if (arrName === 'customCmds') customCmds = customCmds.filter(c => c !== val);
+    el.parentElement.remove();
+  }
+
+  // ── OUTPUT TABS ──
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.out-block').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+    document.getElementById('blk-' + tab).classList.add('active');
+    btn.classList.add('on');
+  }
+
+  // ── COPY / DOWNLOAD ──
+  function copyOut(elId, btn) {
+    const txt = document.getElementById(elId).textContent;
+    navigator.clipboard.writeText(txt).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Đã copy!';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('ok'); }, 2000);
+    });
+  }
+
+  function dlOut(elId, filename) {
+    const txt = document.getElementById(elId).textContent;
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── COLLECT ──
+  function g(id) { return (document.getElementById(id) || {}).value || ''; }
+  function selChip(gid) {
+    const el = document.querySelector(`#${gid} .chip.on`);
+    return el ? el.textContent.trim() : '';
+  }
+  function selChips(gid) {
+    return Array.from(document.querySelectorAll(`#${gid} .chip.on`)).map(c => c.textContent.trim());
+  }
+
+  function collect() {
+    return {
+      gptName: g('gptName') || 'MyGPT',
+      gptVer: g('gptVer') || '1.0',
+      gptDomain: g('gptDomain'),
+      gptGoal: g('gptGoal'),
+      userName: g('userName'),
+      userRole: g('userRole'),
+      lang: selChip('langChips') || 'Tiếng Việt',
+      tone: selChip('toneChips') || 'Chuyên nghiệp · Rõ ràng',
+      respLen: document.getElementById('respLen').value,
+      selfRef: g('selfRef') || 'tôi',
+      userRef: g('userRef') || 'bạn',
+      proactive: isOn('tr-proactive'),
+      confirm: isOn('tr-confirm'),
+      conflict: isOn('tr-conflict'),
+      nosrc: isOn('tr-nosrc'),
+      stepbystep: isOn('tr-stepbystep'),
+      caps: Array.from(document.querySelectorAll('#capGrid .cap-card.on')).map(c => c.querySelector('.cap-name').textContent),
+      skills, limits,
+      baseKnow: g('baseKnow'),
+      currentProject: g('currentProject'),
+      currentChallenge: g('currentChallenge'),
+      topics: topicTags,
+      memMode,
+      memPrio: selChips('memPrioChips'),
+      endCmd: selChip('endCmdChips') || '"kết thúc phiên"',
+      memClean: document.getElementById('memClean').value,
+      cmdStatus: isOn('tr-status'),
+      cmdRecap: isOn('tr-recap'),
+      cmdLearn: isOn('tr-learn'),
+      cmdProfile: isOn('tr-profile'),
+      cmdReset: isOn('tr-reset'),
+      cmdFocus: isOn('tr-focus'),
+      customCmds,
+      extraRules: g('extraRules'),
+      sessionGreet: g('sessionGreet'),
+    };
+  }
+
+  // ── GENERATE ──
+  function generate() {
+    markDone(5);
+    const d = collect();
+    const memMap = { full: 'Full Memory Engine', chatgpt: 'ChatGPT Memory Plugin', manual: 'Manual Context' };
+    const rMap = { concise: 'Ngắn gọn', balanced: 'Cân bằng', detailed: 'Chi tiết', adaptive: 'Thích ứng' };
+
+    document.getElementById('sumGrid').innerHTML = `
+      <div class="sum-card"><div class="sum-label">GPT</div><div class="sum-val">${d.gptName} <span style="color:var(--text3);font-size:12px;font-weight:400">v${d.gptVer}</span></div></div>
+      <div class="sum-card"><div class="sum-label">Chuyên môn</div><div class="sum-val">${d.gptDomain || '—'}</div></div>
+      <div class="sum-card"><div class="sum-label">Giọng điệu</div><div class="sum-val">${d.tone}</div></div>
+      <div class="sum-card"><div class="sum-label">Bộ nhớ</div><div class="sum-val">${memMap[d.memMode]}</div></div>
+    `;
+
+    const sys = buildSystem(d);
+    document.getElementById('sysTxt').textContent = sys;
+    document.getElementById('onbTxt').textContent = buildOnboarding(d);
+    document.getElementById('sessTxt').textContent = buildSession(d);
+    document.getElementById('memTxt').textContent = buildMemTemplate(d);
+
+    // Token estimate
+    const toks = Math.round(sys.length / 4);
+    const pct = Math.min(100, Math.round((toks / 8000) * 100));
+    document.getElementById('tokenFill').style.width = pct + '%';
+    document.getElementById('tokenCount').textContent = `${toks.toLocaleString()} / 8,000 tokens`;
+
+    doSwitch(6);
+  }
+
+  // ── SYSTEM PROMPT BUILDER ──
+  function buildSystem(d) {
+    const rmap = {
+      concise: 'Ngắn gọn — chỉ điểm cốt lõi, tránh dài dòng',
+      balanced: 'Cân bằng — ngắn khi đơn giản, chi tiết khi cần thiết',
+      detailed: 'Chi tiết — giải thích đầy đủ, luôn kèm ví dụ cụ thể',
+      adaptive: 'Thích ứng — hỏi trước khi trả lời dài'
+    };
+    let o = '';
+    o += `╔══════════════════════════════════════════════╗\n`;
+    o += `║  ${(d.gptName + ' · v' + d.gptVer).padEnd(43)}║\n`;
+    o += `║  MY GPT · CUSTOM GPT SYSTEM PROMPT          ║\n`;
+    o += `╚══════════════════════════════════════════════╝\n\n`;
+
+    o += `## I. DANH TÍNH\n\n`;
+    o += `Tên: ${d.gptName}\nPhiên bản: ${d.gptVer}\n`;
+    o += `Chuyên môn: ${d.gptDomain || 'Đa lĩnh vực'}\n`;
+    o += `Ngôn ngữ chính: ${d.lang}\n\n`;
+
+    o += `## II. SỨ MỆNH & TRIẾT LÝ VẬN HÀNH\n\n`;
+    o += `Mục tiêu: ${d.gptGoal}\n\n`;
+    if (d.nosrc) {
+      o += `TRI THỨC NỘI TẠI:\nMọi phân tích và giải pháp xuất phát từ kiến thức đã tích lũy\n`;
+      o += `qua các phiên. Khi không chắc → nói thẳng và suy luận từ ngữ cảnh đã biết.\n\n`;
+    }
+    if (d.conflict) {
+      o += `MÂU THUẪN: Khi thông tin mới mâu thuẫn với dữ liệu đã lưu,\n`;
+      o += `cảnh báo ngay và hỏi người dùng muốn giữ phiên bản nào.\n\n`;
+    }
+    if (d.stepbystep) {
+      o += `TƯ DUY THEO BƯỚC: Với câu hỏi phức tạp, luôn trình bày\n`;
+      o += `quá trình lý luận trước khi đưa ra kết luận (Chain of Thought).\n\n`;
+    }
+
+    o += `## III. PHONG CÁCH GIAO TIẾP\n\n`;
+    o += `Giọng điệu: ${d.tone}\n`;
+    o += `Độ dài: ${rmap[d.respLen]}\n`;
+    o += `Xưng hô: ${d.gptName} xưng "${d.selfRef}" — gọi người dùng "${d.userRef}"\n`;
+    o += `Tránh: Mở đầu bằng "Tất nhiên!", "Chắc chắn!", hay lời khen sáo rỗng\n`;
+    if (d.proactive) o += `Chủ động: Đề xuất cải thiện, bước tiếp theo khi thấy cơ hội phù hợp\n`;
+    o += `\n`;
+
+    if (d.caps.length > 0) {
+      o += `## IV. LĨNH VỰC NĂNG LỰC\n\n`;
+      d.caps.forEach(c => { o += `• ${c}\n`; });
+      o += `\n`;
+    }
+    if (d.skills.length > 0) {
+      o += `Công cụ & Framework: ${d.skills.join(' · ')}\n\n`;
+    }
+    if (d.topics.length > 0) {
+      o += `Chủ đề đào tạo: ${d.topics.join(' · ')}\n\n`;
+    }
+    if (d.limits.length > 0) {
+      o += `GIỚI HẠN CỨNG (không bao giờ vi phạm):\n`;
+      d.limits.forEach(l => { o += `✗ ${l}\n`; });
+      o += `\n`;
+    }
+
+    if (d.baseKnow) {
+      o += `## V. TRI THỨC NỀN TẢNG\n\n${d.baseKnow}\n\n`;
+    }
+    if (d.currentProject) {
+      o += `## V.b NGỮ CẢNH HIỆN TẠI\n\n`;
+      o += `Dự án đang làm: ${d.currentProject}\n`;
+      if (d.currentChallenge) o += `Thách thức: ${d.currentChallenge}\n`;
+      o += `\n`;
+    }
+
+    o += `## VI. HỆ THỐNG BỘ NHỚ DÀI HẠN\n\n`;
+    if (d.memMode === 'full') {
+      o += `CHẾ ĐỘ: Full Memory Engine\n\n`;
+      o += `ĐỌC BỘ NHỚ:\nKhi thấy [MEMORY SNAPSHOT] ở đầu tin nhắn:\n`;
+      o += `→ Đọc và tích hợp toàn bộ vào ngữ cảnh làm việc\n`;
+      o += `→ Xác nhận: "✓ Đã nạp ký ức. ${d.selfRef} nhớ: [tóm tắt ngắn]"\n\n`;
+      o += `GHI TỰ ĐỘNG:\nKhi gặp thông tin quan trọng, đánh dấu nội bộ:\n`;
+      o += `⟨MEM⟩ [loại: DECISION/PREF/PROG/KNOW] [nội dung] ⟨/MEM⟩\n\n`;
+      o += `ƯU TIÊN GHI NHỚ:\n`;
+      (d.memPrio.length > 0 ? d.memPrio : ['Quyết định & lý do', 'Tiến độ dự án', 'Sở thích làm việc']).forEach(p => {
+        o += `• ${p}\n`;
+      });
+      o += `\nKHI NHẬN LỆNH ${d.endCmd} → Xuất Memory Snapshot theo format:\n`;
+      o += `━━━ MEMORY SNAPSHOT · ${d.gptName} ━━━\n`;
+      o += `Phiên: [N] | Ngày: [ngày hôm nay]\n`;
+      o += `// HỒ SƠ: [Tên] | [Vai trò] | [Phong cách]\n`;
+      o += `// DỰ ÁN: [Tên] | [Trạng thái] | [Bước tiếp]\n`;
+      o += `// QUYẾT ĐỊNH: [Nội dung] | [Lý do] | [Kết quả]\n`;
+      o += `// TRI THỨC: [Kết luận từ thảo luận chuyên sâu]\n`;
+      o += `// SỞ THÍCH: [Thích/Không thích] | [Cách tư duy]\n`;
+      o += `// LỖIX: [Lỗi gặp] | [Cách fix]\n`;
+      o += `━━━ END SNAPSHOT ━━━\n\n`;
+    } else if (d.memMode === 'chatgpt') {
+      o += `CHẾ ĐỘ: ChatGPT Memory Plugin\n\n`;
+      o += `Khi gặp thông tin quan trọng về người dùng hoặc dự án,\n`;
+      o += `CHỦ ĐỘNG yêu cầu save vào memory của ChatGPT.\n`;
+      o += `Ví dụ: "Tôi sẽ lưu điều này vào memory để nhớ cho lần sau."\n\n`;
+      o += `Tại đầu mỗi phiên: kiểm tra memory, tóm tắt ngắn những gì đã nhớ về người dùng.\n\n`;
+    } else {
+      o += `CHẾ ĐỘ: Manual Context\n\n`;
+      o += `Người dùng tự cung cấp ngữ cảnh cần thiết ở đầu mỗi phiên.\n`;
+      o += `Khi nhận ${d.endCmd}: tóm tắt phiên và đề xuất bước tiếp theo.\n\n`;
+    }
+
+    const cmds = [];
+    if (d.cmdStatus) cmds.push('/status     → Báo cáo trạng thái memory và ngữ cảnh hiện tại');
+    if (d.cmdRecap)  cmds.push('/recap      → Tóm tắt những gì đã thảo luận trong phiên này');
+    if (d.cmdLearn)  cmds.push('/learn [x]  → Ghi nhớ thủ công thông tin cụ thể vào long-term memory');
+    if (d.cmdProfile) cmds.push('/profile    → Hiển thị toàn bộ hồ sơ và sở thích đã ghi nhận');
+    if (d.cmdReset)  cmds.push('/reset      → Xóa toàn bộ ngữ cảnh (yêu cầu xác nhận trước)');
+    if (d.cmdFocus)  cmds.push('/focus [x]  → Chuyển sang chế độ chuyên gia về chủ đề cụ thể');
+    d.customCmds.forEach(c => cmds.push(c));
+    if (cmds.length > 0) {
+      o += `## VII. LỆNH HỆ THỐNG\n\n`;
+      cmds.forEach(c => { o += `${c}\n`; });
+      o += `\n`;
+    }
+
+    if (d.extraRules) {
+      o += `## VIII. QUY TẮC BỔ SUNG\n\n${d.extraRules}\n\n`;
+    }
+
+    o += `## IX. CẤU TRÚC PHIÊN\n\n`;
+    const greet = d.sessionGreet || `Phiên mới! ${d.userName || 'Bạn'} muốn làm gì hôm nay?`;
+    o += `MỞ PHIÊN: "${greet}"\n`;
+    o += `KẾT PHIÊN khi nhận ${d.endCmd}: tóm tắt + snapshot + đề xuất bước tiếp theo\n`;
+    if (d.confirm) o += `XÁC NHẬN: Luôn hỏi trước khi xóa hoặc reset thông tin quan trọng.\n`;
+
+    o += `\n╔══════════════════════════════════════════════╗\n`;
+    o += `║            END SYSTEM PROMPT                ║\n`;
+    o += `╚══════════════════════════════════════════════╝`;
+    return o;
+  }
+
+  // ── ONBOARDING BUILDER ──
+  function buildOnboarding(d) {
+    const name = d.gptName;
+    let o = `Xin chào ${name}! Đây là phiên onboarding đầu tiên — tôi sẽ cung cấp\n`;
+    o += `thông tin nền để bạn hiểu rõ về tôi và làm việc hiệu quả nhất.\n\n`;
+    o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nHỒ SƠ CÁ NHÂN\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    if (d.userName) o += `• Tên: ${d.userName}\n`;
+    if (d.userRole) o += `• Vai trò: ${d.userRole}\n`;
+    o += `• Mục tiêu dùng ${name}: ${d.gptGoal}\n`;
+    o += `• Giọng điệu tôi thích: ${d.tone}\n`;
+    o += `• Xưng hô: ${name} xưng "${d.selfRef}", gọi tôi là "${d.userRef}"\n\n`;
+
+    o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nPHONG CÁCH LÀM VIỆC\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    const rmap2 = {
+      concise: 'ngắn gọn, đừng dài dòng',
+      balanced: 'cân bằng tùy tình huống',
+      detailed: 'chi tiết có ví dụ cụ thể',
+      adaptive: 'hỏi tôi trước khi trả lời dài'
+    };
+    o += `• Độ dài ưa thích: ${rmap2[d.respLen]}\n`;
+    if (d.proactive) o += `• Hãy chủ động gợi ý khi thấy cơ hội cải thiện\n`;
+    if (d.nosrc) o += `• Không trích nguồn ngoài — chỉ dùng tri thức tích lũy của chúng ta\n`;
+    if (d.stepbystep) o += `• Hãy trình bày quá trình lý luận trước khi kết luận\n`;
+    o += `\n`;
+
+    if (d.skills.length > 0) {
+      o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCÔNG CỤ & FRAMEWORK QUEN DÙNG\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      o += d.skills.map(s => `• ${s}`).join('\n') + '\n\n';
+    }
+
+    if (d.topics.length > 0) {
+      o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCHỦ ĐỀ QUAN TÂM\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      o += d.topics.map(t => `• ${t}`).join('\n') + '\n\n';
+    }
+
+    if (d.baseKnow) {
+      o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nTRI THỨC VÀ NGỮ CẢNH NỀN\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      o += `${d.baseKnow}\n\n`;
+    }
+
+    if (d.currentProject) {
+      o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nNGỮ CẢNH HIỆN TẠI\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      o += `Dự án: ${d.currentProject}\n`;
+      if (d.currentChallenge) o += `Thách thức: ${d.currentChallenge}\n`;
+      o += `\n`;
+    }
+
+    o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nXÁC NHẬN\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    o += `Sau khi đọc xong, xác nhận những gì bạn ghi nhận về tôi,\n`;
+    o += `hỏi nếu cần làm rõ thêm điều gì. Sau đó chúng ta bắt đầu!`;
+    return o;
+  }
+
+  // ── SESSION START BUILDER ──
+  function buildSession(d) {
+    let o = `[MEMORY SNAPSHOT]\n`;
+    o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    o += `[Dán nội dung snapshot từ phiên trước vào đây]\n\n`;
+    o += `Ví dụ:\n`;
+    o += `  Phiên: 3 | Ngày: [ngày trước]\n`;
+    o += `  // HỒ SƠ: ${d.userName || 'User'} | ${d.userRole || 'Vai trò'}\n`;
+    o += `  // DỰ ÁN: ${d.gptDomain || 'Dự án'} | Đang ở bước X | Tiếp theo: Y\n`;
+    o += `  // QUYẾT ĐỊNH: Đã chọn phương án A vì lý do B\n`;
+    o += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    o += `Xin chào ${d.gptName}! Tôi đã paste snapshot từ phiên trước.\n`;
+    o += `Xác nhận bạn đã đọc và tóm tắt ngắn những gì bạn nhớ về tôi.\n\n`;
+    o += `Mục tiêu phiên hôm nay: [mô tả mục tiêu cụ thể]`;
+    return o;
+  }
+
+  // ── MEMORY TEMPLATE BUILDER ──
+  function buildMemTemplate(d) {
+    let o = `━━━ MEMORY SNAPSHOT · ${d.gptName} v${d.gptVer} ━━━\n`;
+    o += `Phiên: [số phiên] | Ngày: [ngày hôm nay]\n\n`;
+    o += `// HỒ SƠ NGƯỜI DÙNG\n`;
+    o += `  Tên: ${d.userName || '[tên]'}\n`;
+    o += `  Vai trò: ${d.userRole || '[vai trò]'}\n`;
+    o += `  Phong cách làm việc: [mô tả ngắn]\n\n`;
+    o += `// DỰ ÁN & TRẠNG THÁI\n`;
+    o += `  Dự án: [tên]\n`;
+    o += `  Tech stack: [tools đang dùng]\n`;
+    o += `  Bước hiện tại: [mô tả]\n`;
+    o += `  Bước tiếp theo: [mô tả]\n\n`;
+    o += `// QUYẾT ĐỊNH ĐÃ ĐƯA RA\n`;
+    o += `  - [Quyết định 1] | Lý do: [...] | Kết quả: [...]\n`;
+    o += `  - [Quyết định 2] | Lý do: [...] | Kết quả: [...]\n\n`;
+    o += `// TRI THỨC TÍCH LŨY\n`;
+    o += `  - [Chủ đề] → [Kết luận / insight quan trọng]\n`;
+    o += `  - [Chủ đề] → [Kết luận / insight quan trọng]\n\n`;
+    o += `// SỞ THÍCH & PATTERN\n`;
+    o += `  Thích: [điều 1, điều 2]\n`;
+    o += `  Không thích: [điều 1, điều 2]\n`;
+    o += `  Cách tư duy: [mô tả]\n\n`;
+    o += `// LỖI & CÁCH FIX\n`;
+    o += `  - [Lỗi gặp] → [Cách fix đã áp dụng]\n\n`;
+    o += `// GHI CHÚ PHIÊN NÀY\n`;
+    o += `  [Các ghi chú đặc biệt khác]\n\n`;
+    o += `━━━ END SNAPSHOT ━━━`;
+    return o;
+  }
+</script>
+</body>
+</html>
