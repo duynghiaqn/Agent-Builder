@@ -1923,7 +1923,15 @@
           </div>
           <div>
             <label>Nghề nghiệp / Vai trò</label>
-            <input type="text" id="userRole" placeholder="Senior Dev, Founder, Researcher…">
+            <input type="text" id="userRole" placeholder="Chuyên viên cao cấp, Lãnh đạo…">
+            <div class="chip-wrap" id="roleChips" style="margin-top:8px">
+              <div class="chip" onclick="pickRole(this)">Chuyên viên cao cấp</div>
+              <div class="chip" onclick="pickRole(this)">Lãnh đạo quản lý</div>
+              <div class="chip" onclick="pickRole(this)">Công chức cấp xã</div>
+              <div class="chip" onclick="pickRole(this)">Chuyên viên văn thư</div>
+              <div class="chip" onclick="pickRole(this)">Cán bộ pháp chế</div>
+              <div class="chip" onclick="pickRole(this)">Chuyên viên hành chính</div>
+            </div>
           </div>
         </div>
         <div class="field">
@@ -2270,13 +2278,26 @@
             placeholder="Dán thông tin bạn muốn Gem biết từ đầu:&#10;• Quy trình, workflow đang dùng&#10;• Stack kỹ thuật / công cụ&#10;• Nguyên tắc làm việc&#10;• Bối cảnh dự án hiện tại…"
             oninput="charCount(this,'baseKnowCnt',3000)"></textarea>
           <div class="char-c" id="baseKnowCnt">0 / 3000</div>
-          <div class="chip-wrap" style="margin-top:10px">
-            <div class="chip" onclick="appendBaseKnow('Nghị định 30/2020/NĐ-CP về công tác văn thư')">📄 Nghị định 30</div>
-            <div class="chip" onclick="appendBaseKnow('Nghị định 63/2010/NĐ-CP về kiểm soát TTHC')">🔍 Kiểm soát TTHC</div>
-            <div class="chip" onclick="appendBaseKnow('Cơ cấu tổ chức và chức năng nhiệm vụ của đơn vị')">🏛️ Cơ cấu tổ chức</div>
-            <div class="chip" onclick="appendBaseKnow('Quy trình tiếp nhận và giải quyết phản ánh kiến nghị')">📩 Phản ánh kiến nghị</div>
-            <div class="chip" onclick="appendBaseKnow('Danh mục dịch vụ công trực tuyến và quy trình giải quyết')">🌐 Dịch vụ công</div>
-            <div class="chip" onclick="appendBaseKnow('Kế hoạch Chuyển đổi số và Đề án 06 tại địa phương')">💻 Chuyển đổi số</div>
+          <div class="chip-wrap" id="baseKnowChips" style="margin-top:10px">
+            <div class="chip" onclick="appendBaseKnow('Nghị định 118/2025/NĐ-CP về cơ chế một cửa, một cửa liên thông')">📄 NĐ 118/2025</div>
+            <div class="chip" onclick="appendBaseKnow('Thông tư 03/2025/TT-VPCP: Hướng dẫn thi hành Nghị định 118/2025/NĐ-CP')">📝 TT 03/2025</div>
+            <div class="chip" onclick="appendBaseKnow('Thông tư 01/2023/TT-VPCP: Số hóa hồ sơ, kết quả giải quyết TTHC')">📂 TT 01/2023</div>
+            <div class="chip" onclick="appendBaseKnow('Luật số 148/2025/QH15 của Quốc hội: Luật Chuyển đổi số')">⚡ Luật Chuyển đổi số</div>
+            <div class="chip" onclick="appendBaseKnow('Luật số 31/2024/QH15 của Quốc hội: Luật Đất đai')">🪵 Luật Đất đai</div>
+            <div class="chip" onclick="appendBaseKnow('Luật số 15/2023/QH15 của Quốc hội: Luật Khám bệnh, chữa bệnh')">🏥 Luật Khám chữa bệnh</div>
+            <div class="chip" onclick="appendBaseKnow('Luật số 72/2025/QH15: Luật Tổ chức chính quyền địa phương')">🏛️ Luật Chính quyền ĐP</div>
+            <div class="chip" onclick="appendBaseKnow('Nghị định 150/2025/NĐ-CP về tổ chức các cơ quan chuyên môn thuộc UBND')">📋 NĐ 150/2025</div>
+          </div>
+          <div class="tag-input-row" style="margin-top:12px">
+            <input type="text" id="customBaseKnowIn" placeholder="Thêm nhanh văn bản/ngữ cảnh mới..."
+              onkeydown="if(event.key==='Enter')addCustomBaseKnow()">
+            <button class="btn-add" onclick="addCustomBaseKnow()">+</button>
+          </div>
+          <div style="margin-top:12px; font-size:12px;">
+            <a href="https://vanban.chinhphu.vn/he-thong-van-ban?classid=1&mode=1&typegroupid=3" target="_blank" style="color:var(--cyan); text-decoration:none; display:flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+              Tra cứu văn bản mới tại Cổng Thông tin điện tử Chính phủ
+            </a>
           </div>
         </div>
 
@@ -2831,6 +2852,11 @@
       el.classList.add('on');
       document.getElementById('sessionGreet').value = el.textContent.trim();
     }
+    function pickRole(el) {
+      document.querySelectorAll('#roleChips .chip').forEach(c => c.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('userRole').value = el.textContent.trim();
+    }
     function toggleExtraRule(el) {
       el.classList.toggle('on');
       const textarea = document.getElementById('extraRules');
@@ -2904,6 +2930,21 @@
       const val = ta.value.trim();
       ta.value = val ? (val + '\n• ' + txt) : ('• ' + txt);
       charCount(ta, 'baseKnowCnt', 3000);
+      showToast('Đã thêm vào tri thức nền', 'info');
+    }
+    function addCustomBaseKnow() {
+      const input = document.getElementById('customBaseKnowIn');
+      const val = input.value.trim();
+      if (!val) return;
+      const wrap = document.getElementById('baseKnowChips');
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      chip.textContent = '🆕 ' + (val.length > 20 ? val.substring(0, 20) + '...' : val);
+      chip.onclick = function () { appendBaseKnow(val); };
+      wrap.appendChild(chip);
+      input.value = '';
+      input.focus();
+      showToast('Đã tạo gợi ý mới!', 'success');
     }
     function addTag(inputId, listId, arr) {
       const input = document.getElementById(inputId);
