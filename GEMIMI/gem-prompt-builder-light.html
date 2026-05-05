@@ -6,9 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gem Prompt Architect</title>
   <link rel="icon" type="image/svg+xml"
-    href="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg">
+    href="https://upload.wikimedia.org/wikipedia/commons/1/1d/Google_Gemini_icon_2025.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
 
     :root {
       --bg: #f0f4fa;
@@ -33,7 +36,7 @@
       --text3: #7a96b2;
       --done: #00a98e;
       --done-soft: rgba(0, 169, 142, 0.1);
-      --font: 'Space Grotesk', sans-serif;
+      --font: 'Be Vietnam Pro', sans-serif;
       --mono: 'Fira Code', monospace;
       --serif: 'Playfair Display', serif;
     }
@@ -205,8 +208,10 @@
       position: relative;
     }
 
-    .brand-gem svg {
+    .brand-gem img {
       filter: drop-shadow(0 0 12px rgba(26, 127, 212, 0.8));
+      width: 40px;
+      height: 40px;
     }
 
     .brand-title {
@@ -1596,25 +1601,7 @@
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="brand-gem">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px;">
-            <path d="M12 22C12 22 12 16.5 12 12C12 7.5 12 2 12 2C12 2 14.5 7.5 19 12C23.5 16.5 12 22 12 22Z"
-              fill="url(#gemGrad)" />
-            <path d="M12 22C12 22 12 16.5 12 12C12 7.5 12 2 12 2C12 2 9.5 7.5 5 12C0.5 16.5 12 22 12 22Z"
-              fill="url(#gemGrad2)" />
-            <defs>
-              <linearGradient id="gemGrad" x1="12" y1="2" x2="19" y2="22" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#4285F4" />
-                <stop offset="100%" stop-color="#9b72cb" />
-              </linearGradient>
-              <linearGradient id="gemGrad2" x1="12" y1="2" x2="5" y2="22" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#4285F4" />
-                <stop offset="100%" stop-color="#d96570" />
-              </linearGradient>
-            </defs>
-            <circle cx="12" cy="12" r="1.5" fill="white">
-              <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
-            </circle>
-          </svg>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/Google_Gemini_icon_2025.svg" alt="Gemini Logo">
         </div>
         <div class="brand-title">Gem Prompt<br><em>Architect</em></div>
         <div class="brand-sub">v2.0 · Gemini AI</div>
@@ -2194,6 +2181,14 @@
             placeholder="Dán thông tin bạn muốn Gem biết từ đầu:&#10;• Quy trình, workflow đang dùng&#10;• Stack kỹ thuật / công cụ&#10;• Nguyên tắc làm việc&#10;• Bối cảnh dự án hiện tại…"
             oninput="charCount(this,'baseKnowCnt',3000)"></textarea>
           <div class="char-c" id="baseKnowCnt">0 / 3000</div>
+          <div class="chip-wrap" style="margin-top:10px">
+            <div class="chip" onclick="appendBaseKnow('Nghị định 30/2020/NĐ-CP về công tác văn thư')">📄 Nghị định 30</div>
+            <div class="chip" onclick="appendBaseKnow('Nghị định 63/2010/NĐ-CP về kiểm soát TTHC')">🔍 Kiểm soát TTHC</div>
+            <div class="chip" onclick="appendBaseKnow('Cơ cấu tổ chức và chức năng nhiệm vụ của đơn vị')">🏛️ Cơ cấu tổ chức</div>
+            <div class="chip" onclick="appendBaseKnow('Quy trình tiếp nhận và giải quyết phản ánh kiến nghị')">📩 Phản ánh kiến nghị</div>
+            <div class="chip" onclick="appendBaseKnow('Danh mục dịch vụ công trực tuyến và quy trình giải quyết')">🌐 Dịch vụ công</div>
+            <div class="chip" onclick="appendBaseKnow('Kế hoạch Chuyển đổi số và Đề án 06 tại địa phương')">💻 Chuyển đổi số</div>
+          </div>
         </div>
 
         <div class="field">
@@ -2209,6 +2204,8 @@
               cứ pháp lý cụ thể</div>
             <div class="chip" onclick="addLimitSuggest('Khi không chắc → ghi [CẦN XÁC MINH] thay vì phỏng đoán')">🔍 Ghi
               [CẦN XÁC MINH]</div>
+            <div class="chip" onclick="addLimitSuggest('Tuyệt đối không được vượt qua các nguyên tắc an toàn cốt lõi')">🛡️ An toàn cốt lõi</div>
+            <div class="chip" onclick="addLimitSuggest('Không được xâm phạm quyền riêng tư của cá nhân và tổ chức')">🔒 Quyền riêng tư</div>
           </div>
           <div class="tag-list" id="limitTags"></div>
         </div>
@@ -2465,26 +2462,23 @@
         <div class="field">
           <label>Lệnh tùy chỉnh riêng</label>
           <div class="tag-input-row">
-            <input type="text" id="cmdIn" placeholder="/review → Gem review lại quyết định đã đưa ra…"
+            <input type="text" id="cmdIn" placeholder="/soan-thao → Gem hỗ trợ soạn thảo văn bản hành chính…"
               onkeydown="if(event.key==='Enter')addTag('cmdIn','cmdTags',customCmds)">
             <button class="btn-add" onclick="addTag('cmdIn','cmdTags',customCmds)">+</button>
           </div>
           <div class="tag-list" id="cmdTags"></div>
           <div class="chip-wrap" id="cmdSuggests" style="margin-top:12px">
-            <div class="chip" onclick="addCmdSuggest('/phan-tich → Phân tích chuyên sâu vấn đề hiện tại', this)">
-              /phântích</div>
-            <div class="chip" onclick="addCmdSuggest('/doc-nho → Đọc và tóm tắt các ghi nhớ quan trọng', this)">
-              /đọcghinhớ</div>
-            <div class="chip" onclick="addCmdSuggest('/phan-bien → Phản biện và tìm lỗ hổng trong giải pháp', this)">
-              /phảnbiện</div>
-            <div class="chip" onclick="addCmdSuggest('/nghien-cuu → Nghiên cứu sâu về các quy định liên quan', this)">
-              /nghiêncứu</div>
-            <div class="chip"
-              onclick="addCmdSuggest('/dinh-huong → Định hướng chiến lược và các bước tiếp theo', this)">/địnhhướng
-            </div>
-            <div class="chip" onclick="addCmdSuggest('/giai-phap → Đề xuất các giải pháp khả thi', this)">/giảipháp
-            </div>
-            <div class="chip" onclick="addCmdSuggest('/y-tuong → Brainstorming các ý tưởng mới', this)">/ýtưởng</div>
+            <div class="chip" onclick="addCmdSuggest('/phan-tich → Phân tích chuyên sâu vấn đề hiện tại', this)">/phan-tich</div>
+            <div class="chip" onclick="addCmdSuggest('/soan-thao → Soạn thảo văn bản theo chuẩn hành chính', this)">/soan-thao</div>
+            <div class="chip" onclick="addCmdSuggest('/kiem-tra → Kiểm tra thể thức và lỗi văn bản', this)">/kiem-tra</div>
+            <div class="chip" onclick="addCmdSuggest('/tra-cuu → Tra cứu quy định pháp luật liên quan', this)">/tra-cuu</div>
+            <div class="chip" onclick="addCmdSuggest('/tom-tat → Tóm tắt nội dung văn bản/báo cáo', this)">/tom-tat</div>
+            <div class="chip" onclick="addCmdSuggest('/phan-bien → Phản biện và tìm lỗ hổng giải pháp', this)">/phan-bien</div>
+            <div class="chip" onclick="addCmdSuggest('/nghien-cuu → Nghiên cứu sâu các quy định liên quan', this)">/nghien-cuu</div>
+            <div class="chip" onclick="addCmdSuggest('/dinh-huong → Định hướng các bước xử lý tiếp theo', this)">/dinh-huong</div>
+            <div class="chip" onclick="addCmdSuggest('/giai-phap → Đề xuất phương án giải quyết tối ưu', this)">/giai-phap</div>
+            <div class="chip" onclick="addCmdSuggest('/cai-cach → Đề xuất cải cách thủ tục hành chính', this)">/cai-cach</div>
+            <div class="chip" onclick="addCmdSuggest('/lap-ke-hoach → Lập kế hoạch thực hiện nhiệm vụ', this)">/lap-ke-hoach</div>
           </div>
         </div>
 
@@ -2504,11 +2498,11 @@
           <label>Lời chào mở phiên mới</label>
           <input type="text" id="sessionGreet" placeholder='"Phiên mới. Hôm nay chúng ta làm gì?"'>
           <div class="chip-wrap" id="greetChips" style="margin-top:10px">
-            <div class="chip" onclick="pickGreet(this)">Sẵn sàng cho phiên làm việc mới. Hôm nay chúng ta sẽ bắt đầu từ
-              đâu?</div>
-            <div class="chip" onclick="pickGreet(this)">Phiên làm việc mới đã bắt đầu. Tôi đã sẵn sàng hỗ trợ bạn.</div>
-            <div class="chip" onclick="pickGreet(this)">Chào bạn, tôi đã khôi phục ngữ cảnh. Chúng ta tiếp tục công việc
-              nhé?</div>
+            <div class="chip" onclick="pickGreet(this)">Sẵn sàng cho phiên làm việc mới. Hôm nay chúng ta sẽ bắt đầu từ đâu?</div>
+            <div class="chip" onclick="pickGreet(this)">Chào bạn! Tôi đã sẵn sàng đồng hành cùng bạn trong các nhiệm vụ hôm nay. Chúng ta bắt đầu nhé?</div>
+            <div class="chip" onclick="pickGreet(this)">Hệ thống đã sẵn sàng. Tôi có thể giúp gì cho công việc hành chính của bạn ngay lúc này?</div>
+            <div class="chip" onclick="pickGreet(this)">Rất vui được gặp lại bạn. Tôi đã khôi phục ngữ cảnh, bạn muốn triển khai việc nào trước?</div>
+            <div class="chip" onclick="pickGreet(this)">Chào buổi làm việc mới! Hãy cho tôi biết mục tiêu hôm nay để tôi hỗ trợ bạn tốt nhất.</div>
           </div>
         </div>
 
@@ -2815,6 +2809,12 @@
     // ─── TAGS ───
     function addLimitSuggest(txt) {
       if (!limits.includes(txt)) { limits.push(txt); renderTags('limitTags', limits); }
+    }
+    function appendBaseKnow(txt) {
+      const ta = document.getElementById('baseKnow');
+      const val = ta.value.trim();
+      ta.value = val ? (val + '\n• ' + txt) : ('• ' + txt);
+      charCount(ta, 'baseKnowCnt', 3000);
     }
     function addTag(inputId, listId, arr) {
       const input = document.getElementById(inputId);
